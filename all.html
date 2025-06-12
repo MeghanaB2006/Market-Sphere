@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stock Market Insights</title>
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color:rgb(13, 0, 0);
+            color: white;
+            margin: 0;
+            padding: 0;
+            text-align: center;
+        }
+        .nav-bar {
+            background-color: #222;
+            padding: 15px;
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            gap: 15px;
+        }
+        .nav-bar a, .nav-bar button {
+            color: white;
+            text-decoration: none;
+            font-size: 18px;
+            background: none;
+            border: none;
+            cursor: pointer;
+        }
+        .nav-bar a:hover, .nav-bar button:hover {
+            color: #28a745;
+        }
+        .signin-btn {
+            cursor: pointer;
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            transition: 0.3s;
+        }
+        .signin-btn:hover {
+            background-color: #218838;
+        }
+        .avatar {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid #28a745;
+        }
+        .container {
+            padding: 20px;
+        }
+        .hero h1 {
+            font-size: 42px;
+            margin-bottom: 10px;
+        }
+        .hero p {
+            color: #bbb;
+            font-size: 18px;
+        }
+        .button {
+            display: inline-block;
+            padding: 12px 25px;
+            background-color: #28a745;
+            color: white;
+            border-radius: 8px;
+            margin-top: 20px;
+            transition: 0.3s;
+            text-decoration: none;
+            font-size: 18px;
+        }
+        .button:hover {
+            background-color: #218838;
+        }
+        .button.disabled {
+            opacity: 0.5;
+            pointer-events: none;
+        }
+        .ticker-container {
+            width: 100%;
+            overflow: hidden;
+            background-color: #222;
+            padding: 10px 0;
+            white-space: nowrap;
+        }
+        .ticker {
+            display: inline-block;
+            white-space: nowrap;
+            animation: ticker-scroll 30s linear infinite; /* Increased duration to 30s */
+        }
+        @keyframes ticker-scroll {
+            from { transform: translateX(100%); }
+            to { transform: translateX(-100%); }
+        }
+        .stock-section {
+            padding: 30px 10px;
+        }
+        .stock-cards {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 20px;
+            padding: 20px;
+        }
+        .stock-card {
+            background-color: #333;
+            padding: 15px;
+            border-radius: 10px;
+            width: 220px;
+            text-align: left;
+            transition: 0.3s;
+        }
+        .stock-card:hover {
+            background-color: #444;
+            transform: scale(1.05);
+        }
+        .footer {
+            background-color: #222;
+            padding: 20px;
+            margin-top: 30px;
+            font-size: 14px;
+        }
+        #signin-page {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(5px);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        #signin-page .content {
+            background: #1c1c1c;
+            color: white;
+            padding: 30px;
+            border-radius: 12px;
+            text-align: center;
+            width: 350px;
+            position: relative;
+        }
+        #signin-page .close-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 20px;
+            cursor: pointer;
+        }
+        #signin-page input {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #28a745;
+            border-radius: 5px;
+            font-size: 14px;
+            background-color: #333;
+            color: white;
+        }
+        #signin-page input::placeholder {
+            color: #aaa;
+        }
+        #signin-page button.submit-btn {
+            width: 100%;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            margin-top: 15px;
+        }
+        .divider {
+            margin: 20px 0;
+            position: relative;
+            text-align: center;
+        }
+        .divider::before, .divider::after {
+            content: "";
+            height: 1px;
+            width: 40%;
+            background: #ccc;
+            position: absolute;
+            top: 50%;
+        }
+        .divider::before { left: 0; }
+        .divider::after { right: 0; }
+        .loading-spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #28a745;
+            border-top: 3px solid transparent;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-right: 10px;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+<div class="nav-bar">
+    <a href="markets.html">📈 Markets</a>
+    <a href="news.html">📰 News</a>
+    <button id="signin-btn" class="signin-btn">Sign In</button>
+    <img id="user-avatar" class="avatar" src="" alt="User Avatar" style="display: none;">
+</div>
+
+<div class="container">
+    <div class="hero">
+        <h1>Real-Time Stock Market Insights</h1>
+        <p>Track stocks, indices, and trends effortlessly</p>
+        <a id="get-started" href="homepage.html" class="button disabled">Get Started</a>
+    </div>
+<br><br>
+
+    <div class="ticker-container">
+        <div class="ticker" id="live-ticker"><span class="loading-spinner"></span>Loading stock data...</div>
+    </div>
+<section class="stock-section">
+        <h2>🔥 Trending Stocks</h2>
+        <div class="stock-cards" id="stock-cards"><p><span class="loading-spinner"></span>Loading stock data...</p></div>
+    </section>
+</div>
+
+<div class="footer">
+    <p>© 2025 Stock Market Insights. All rights reserved.</p>
+</div>
+
+<div id="signin-page">
+  <div class="content">
+    <button class="close-btn" onclick="signinPage.style.display='none'">❌</button>
+    <h2>Sign In</h2>
+    <div id="errorMessages" style="color: red; font-size: 14px;"></div>
+    <form id="signin-form">
+      <input type="text" id="name" placeholder="Username" required>
+      <input type="email" id="email" placeholder="Email" required>
+      <input type="tel" id="phone" placeholder="Mobile Number" required>
+      <input type="password" id="password" placeholder="Password" oninput="checkStrength()" required>
+      <div style="text-align: left; font-size: 14px; margin-bottom: 10px;">
+        Password Strength: <span id="strength">-</span>
+      </div>
+      <input type="password" id="confirm-password" placeholder="Confirm Password" required>
+      <button class="submit-btn" type="submit">Sign In</button>
+    </form>
+    <div class="divider">OR</div>
+    <div id="g_id_onload" data-client_id="YOUR_GOOGLE_CLIENT_ID" data-callback="handleCredentialResponse"></div>
+    <div class="g_id_signin" data-type="standard" data-size="large" data-theme="filled_black" data-shape="pill"></div>
+  </div>
+</div>
+
+
+<script>
+ const signinPage = document.getElementById("signin-page");
+    // Define stock symbols for US and Indian markets
+    const stockSymbols = {
+        US: ["AAPL", "TSLA", "GOOGL", "MSFT"],
+        IN: ["BSE:RELIANCE", "BSE:TCS", "BSE:HDFCBANK", "BSE:INFY"]
+    };
+
+    // Mock data for testing
+    const mockStockData = {
+        "AAPL": { "05. price": "198.89", "10. change percent": "-3.15" },
+        "TSLA": { "05. price": "280.26", "10. change percent": "-2.42" },
+        "GOOGL": { "05. price": "164.21", "10. change percent": "0.11" },
+        "MSFT": { "05. price": "436.17", "10. change percent": "0.20" },
+        "BSE:RELIANCE": { "05. price": "3000.50", "10. change percent": "1.71" },
+        "BSE:TCS": { "05. price": "4200.75", "10. change percent": "1.22" },
+        "BSE:HDFCBANK": { "05. price": "1600.20", "10. change percent": "-0.50" },
+        "BSE:INFY": { "05. price": "1800.30", "10. change percent": "0.85" }
+    };
+
+    async function fetchStockData() {
+        try {
+            let tickerText = "";
+            let cards = "";
+            let hasData = false;
+
+            for (const market of Object.keys(stockSymbols)) {
+                for (const symbol of stockSymbols[market]) {
+                    const stockData = mockStockData[symbol];
+
+                    if (stockData) {
+                        hasData = true;
+                        const price = parseFloat(stockData["05. price"]).toFixed(2);
+                        const percentChange = parseFloat(stockData["10. change percent"]).toFixed(2);
+                        const changeColor = parseFloat(percentChange) >= 0 ? "green" : "red";
+                        const currencySymbol = market === "IN" ? "₹" : "$";
+
+                        tickerText += `<span style="color: ${changeColor}; font-weight: bold;">${symbol}: ${currencySymbol}${price} (${percentChange}%)</span>  | `;
+                        cards += `<div class="stock-card">
+                                    <h2>${symbol} (${market})</h2>
+                                    <p>Price: ${currencySymbol}${price}</p>
+                                    <p style="color: ${changeColor};">${percentChange}%</p>
+                                  </div>`;
+                    } else {
+                        console.error(`No mock data for ${symbol} (${market})`);
+                    }
+                }
+            }
+
+            if (hasData) {
+                document.getElementById("live-ticker").innerHTML = tickerText;
+                document.getElementById("stock-cards").innerHTML = cards;
+            } else {
+                document.getElementById("live-ticker").innerHTML = "No stock data available.";
+                document.getElementById("stock-cards").innerHTML = "<p>No stock data available.</p>";
+            }
+
+        } catch (err) {
+            console.error("Failed to load stock data", err);
+            document.getElementById("live-ticker").innerHTML = "Failed to load stock data.";
+            document.getElementById("stock-cards").innerHTML = "<p>Failed to load stock data.</p>";
+        }
+    }
+
+    // Fetch stock data on page load
+    fetchStockData();
+
+    // Sign-in functionality remains unchanged
+    const signinBtn = document.getElementById("signin-btn");
+    const getStartedBtn = document.getElementById("get-started");
+    const userAvatar = document.getElementById("user-avatar");
+   
+    signinBtn.addEventListener("click", () => {
+        if (signinBtn.textContent === "Sign In") {
+            signinPage.style.display = "flex";
+        } else {
+            signinBtn.textContent = "Sign In";
+            userAvatar.style.display = "none";
+            getStartedBtn.classList.add("disabled");
+            getStartedBtn.href = "homepage.html";
+        }
+    });
+
+    function handleCredentialResponse(response) {
+        const decoded = JSON.parse(atob(response.credential.split('.')[1]));
+        userAvatar.src = decoded.picture;
+        userAvatar.style.display = "inline";
+        signinBtn.textContent = "Sign Out";
+        getStartedBtn.classList.remove("disabled");
+        getStartedBtn.href = "homepage.html";
+        signinPage.style.display = "none";
+    }
+
+    document.getElementById("signin-form").addEventListener("submit", function(event) {
+  event.preventDefault();
+  if (validateForm()) {
+    signinBtn.textContent = "Sign Out";
+    userAvatar.src = "https://via.placeholder.com/35";
+    userAvatar.style.display = "inline";
+    getStartedBtn.classList.remove("disabled");
+    getStartedBtn.href = "homepage.html";
+    signinPage.style.display = "none";
+  }
+});
+
+    function validateForm() {
+    const name = document.getElementById("name").value.trim();
+    const email = document.getElementById("email").value.trim();
+    const phone = document.getElementById("phone").value.trim();
+    const password = document.getElementById("password").value.trim();
+    const confirmPassword = document.getElementById("confirm-password").value.trim();
+    const errorDiv = document.getElementById("errorMessages");
+
+    let errors = [];
+
+    if (name === "" || !/^[A-Za-z ]+$/.test(name)) {
+      errors.push("Please enter a valid name.");
+    }
+
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      errors.push("Please enter a valid email address.");
+    }
+
+    if (!/^\d{10}$/.test(phone)) {
+      errors.push("Phone number must be 10 digits.");
+    }
+
+    if (password.length < 6) {
+      errors.push("Password must be at least 6 characters.");
+    }
+
+    if (password !== confirmPassword) {
+      errors.push("Passwords do not match.");
+    }
+
+    errorDiv.innerHTML = errors.join("<br>");
+
+    if (errors.length > 0) {
+      return false;
+    }
+
+    // Update UI on successful validation
+    signinBtn.textContent = "Sign Out";
+    userAvatar.src = "https://via.placeholder.com/35";
+    userAvatar.style.display = "inline";
+    getStartedBtn.classList.remove("disabled");
+    getStartedBtn.href = "homepage.html";
+    signinPage.style.display = "none";
+
+    return true; // prevent default form submit
+  }
+
+  function checkStrength() {
+    const pwd = document.getElementById("password").value;
+    const strength = document.getElementById("strength");
+
+    if (pwd.length < 6) {
+      strength.textContent = "Weak";
+      strength.style.color = "red";
+    } else if (/[A-Z]/.test(pwd) && /\d/.test(pwd) && /[\W_]/.test(pwd)) {
+      strength.textContent = "Strong";
+      strength.style.color = "green";
+    } else {
+      strength.textContent = "Medium";
+      strength.style.color = "orange";
+    }
+  }
+</script>
+</body>
+</html>
+
+

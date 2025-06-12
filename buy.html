@@ -1,0 +1,84 @@
+<!-- buy.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Buy Stocks</title>
+  <style>
+    body {
+      background-color: #0e0e0e;
+      color: #f5f5f5;
+      font-family: 'Poppins', sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    .buy-form {
+      background: #1a1a1a;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 0 20px rgba(0,0,0,0.4);
+      width: 100%;
+      max-width: 400px;
+    }
+    .buy-form h2 {
+      margin-bottom: 20px;
+      color: #4facfe;
+      text-align: center;
+    }
+    .buy-form input {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 15px;
+      border: none;
+      border-radius: 8px;
+      background: #2a2a2a;
+      color: #fff;
+    }
+    .buy-form button {
+      width: 100%;
+      padding: 12px;
+      border: none;
+      border-radius: 8px;
+      background: linear-gradient(45deg, #4facfe, #00f2fe);
+      color: #000;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    .buy-form button:hover {
+      box-shadow: 0 0 15px rgba(79, 172, 254, 0.5);
+    }
+  </style>
+</head>
+<body>
+  <div class="buy-form">
+    <h2>Buy Stocks</h2>
+    <input type="text" id="account" placeholder="Account Number" required>
+    <input type="text" id="symbol" placeholder="Stock Symbol (e.g., AAPL)" required>
+    <input type="number" id="shares" placeholder="Number of Shares" required>
+    <button onclick="buyStock()">Buy</button>
+  </div>
+
+  <script>
+    function buyStock() {
+      const account = document.getElementById('account').value.trim();
+      const symbol = document.getElementById('symbol').value.trim().toUpperCase();
+      const shares = parseInt(document.getElementById('shares').value);
+
+      if (!account || !symbol || !shares) {
+        alert('Please fill all fields correctly.');
+        return;
+      }
+
+      const stock = { symbol, shares };
+      const portfolio = JSON.parse(localStorage.getItem('portfolio')) || [];
+      portfolio.push(stock);
+      localStorage.setItem('portfolio', JSON.stringify(portfolio));
+
+      alert(`Bought ${shares} shares of ${symbol}`);
+      window.location.href = 'portfolio.html';
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Infosys Ltd - Stock Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #0c0c0c 0%, #1a1a1a 100%);
+            color: #ffffff;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding: 20px 0;
+            border-bottom: 1px solid #333;
+        }
+
+        .stock-info h1 {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #ffffff;
+            margin-bottom: 5px;
+        }
+
+        .stock-symbol {
+            color: #888;
+            font-size: 1.2rem;
+        }
+
+        .price-section {
+            text-align: right;
+        }
+
+        .current-price {
+            font-size: 3rem;
+            font-weight: bold;
+            color: #22c55e;
+            margin-bottom: 5px;
+        }
+
+        .price-change {
+            font-size: 1.2rem;
+            color: #22c55e;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .chart-container {
+            background: linear-gradient(145deg, #1a1a1a, #2a2a2a);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(34, 197, 94, 0.1);
+            border: 1px solid #333;
+        }
+
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .time-periods {
+            display: flex;
+            gap: 10px;
+        }
+
+        .time-btn {
+            padding: 8px 16px;
+            background: #333;
+            border: none;
+            border-radius: 8px;
+            color: #fff;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .time-btn.active, .time-btn:hover {
+            background: #22c55e;
+            color: #fff;
+        }
+
+        #stockChart {
+            width: 100%;
+            height: 400px;
+            cursor: crosshair;
+        }
+
+        .stats-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .stat-card {
+            background: linear-gradient(145deg, #1a1a1a, #2a2a2a);
+            border-radius: 15px;
+            padding: 25px;
+            border: 1px solid #333;
+            box-shadow: 0 5px 15px rgba(34, 197, 94, 0.05);
+        }
+
+        .stat-card h3 {
+            color: #22c55e;
+            margin-bottom: 15px;
+            font-size: 1.3rem;
+        }
+
+        .stat-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 12px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #333;
+        }
+
+        .stat-label {
+            color: #aaa;
+        }
+
+        .stat-value {
+            color: #fff;
+            font-weight: bold;
+        }
+
+        .company-overview {
+            grid-column: 1 / -1;
+            background: linear-gradient(145deg, #1a1a1a, #2a2a2a);
+            border-radius: 20px;
+            padding: 30px;
+            border: 1px solid #333;
+            box-shadow: 0 10px 30px rgba(34, 197, 94, 0.1);
+        }
+
+        .company-overview h2 {
+            color: #22c55e;
+            margin-bottom: 20px;
+            font-size: 1.8rem;
+        }
+
+        .company-overview p {
+            line-height: 1.8;
+            color: #ccc;
+            font-size: 1.1rem;
+        }
+
+        .tooltip {
+            position: absolute;
+            background: rgba(0, 0, 0, 0.9);
+            color: #fff;
+            padding: 10px 15px;
+            border-radius: 8px;
+            border: 1px solid #22c55e;
+            font-size: 14px;
+            pointer-events: none;
+            z-index: 1000;
+            backdrop-filter: blur(10px);
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .header {
+                flex-direction: column;
+                text-align: center;
+                gap: 20px;
+            }
+            
+            .current-price {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="stock-info">
+                <h1>Infosys Ltd</h1>
+                <div class="stock-symbol">NSE: INFY</div>
+            </div>
+            <div class="price-section">
+                <div class="current-price">₹1,892.40</div>
+                <div class="price-change">+28.75 (+1.54%)</div>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <div class="chart-container">
+                <div class="chart-header">
+                    <h2>Price Chart</h2>
+                    <div class="time-periods">
+                        <button class="time-btn" onclick="changeTimeframe('1D')">1D</button>
+                        <button class="time-btn" onclick="changeTimeframe('5D')">5D</button>
+                        <button class="time-btn active" onclick="changeTimeframe('1M')">1M</button>
+                        <button class="time-btn" onclick="changeTimeframe('6M')">6M</button>
+                        <button class="time-btn" onclick="changeTimeframe('1Y')">1Y</button>
+                    </div>
+                </div>
+                <canvas id="stockChart"></canvas>
+            </div>
+
+            <div class="stats-panel">
+                <div class="stat-card">
+                    <h3>Market Data</h3>
+                    <div class="stat-row">
+                        <span class="stat-label">Open</span>
+                        <span class="stat-value">₹1,875.30</span>
+                    </div>
+                    <div class="stat-row">
+                        <span class="stat-label">High</span>
+                        <span class="stat-value">₹1,898.20</span>
+                    </div>
+                    <div class="stat-row">
+                        <span class="stat-label">Low</span>
+                        <span class="stat-value">₹1,869.15</span>
+                    </div>
+                    <div class="stat-row">
+                        <span class="stat-label">Volume</span>
+                        <span class="stat-value">8.7M</span>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <h3>Key Metrics</h3>
+                    <div class="stat-row">
+                        <span class="stat-label">Market Cap</span>
+                        <span class="stat-value">₹7.85L Cr</span>
+                    </div>
+                    <div class="stat-row">
+                        <span class="stat-label">P/E Ratio</span>
+                        <span class="stat-value">24.6</span>
+                    </div>
+                    <div class="stat-row">
+                        <span class="stat-label">52W High</span>
+                        <span class="stat-value">₹1,995.75</span>
+                    </div>
+                    <div class="stat-row">
+                        <span class="stat-label">52W Low</span>
+                        <span class="stat-value">₹1,330.45</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="company-overview">
+            <h2>About Infosys</h2>
+            <p>
+                Infosys Limited is a multinational information technology company that provides business consulting, 
+                information technology and outsourcing services. The company was founded in Pune and is headquartered 
+                in Bangalore. Infosys is the second-largest Indian IT company by revenue and market capitalization. 
+                The company provides software development, maintenance and independent validation services to companies 
+                in finance, insurance, manufacturing and other domains. Infosys is known for its global delivery model 
+                and has been a pioneer in the Indian IT services industry, helping transform India into a major 
+                technology hub.
+            </p>
+        </div>
+    </div>
+
+    <div class="tooltip" id="tooltip"></div>
+
+    <script>
+        // Stock price data (simulated)
+        const stockData = {
+            '1D': generateHourlyData(24, 1875, 15),
+            '5D': generateDailyData(5, 1860, 25),
+            '1M': generateDailyData(30, 1820, 40),
+            '6M': generateWeeklyData(26, 1700, 80),
+            '1Y': generateMonthlyData(12, 1500, 120)
+        };
+
+        let currentTimeframe = '1M';
+        let chart = null;
+
+        function generateHourlyData(hours, basePrice, volatility) {
+            const data = [];
+            let price = basePrice;
+            const now = new Date();
+            
+            for (let i = hours; i >= 0; i--) {
+                const time = new Date(now.getTime() - i * 60 * 60 * 1000);
+                price += (Math.random() - 0.5) * volatility;
+                data.push({
+                    time: time,
+                    price: Math.max(price, basePrice * 0.9)
+                });
+            }
+            return data;
+        }
+
+        function generateDailyData(days, basePrice, volatility) {
+            const data = [];
+            let price = basePrice;
+            const now = new Date();
+            
+            for (let i = days; i >= 0; i--) {
+                const time = new Date(now.getTime() - i * 24 * 60 * 60 * 1000);
+                price += (Math.random() - 0.5) * volatility;
+                data.push({
+                    time: time,
+                    price: Math.max(price, basePrice * 0.8)
+                });
+            }
+            return data;
+        }
+
+        function generateWeeklyData(weeks, basePrice, volatility) {
+            const data = [];
+            let price = basePrice;
+            const now = new Date();
+            
+            for (let i = weeks; i >= 0; i--) {
+                const time = new Date(now.getTime() - i * 7 * 24 * 60 * 60 * 1000);
+                price += (Math.random() - 0.5) * volatility;
+                data.push({
+                    time: time,
+                    price: Math.max(price, basePrice * 0.7)
+                });
+            }
+            return data;
+        }
+
+        function generateMonthlyData(months, basePrice, volatility) {
+            const data = [];
+            let price = basePrice;
+            const now = new Date();
+            
+            for (let i = months; i >= 0; i--) {
+                const time = new Date(now.getFullYear(), now.getMonth() - i, 1);
+                price += (Math.random() - 0.5) * volatility;
+                data.push({
+                    time: time,
+                    price: Math.max(price, basePrice * 0.6)
+                });
+            }
+            return data;
+        }
+
+        function initChart() {
+            const canvas = document.getElementById('stockChart');
+            const ctx = canvas.getContext('2d');
+            
+            // Set canvas size
+            canvas.width = canvas.offsetWidth * 2;
+            canvas.height = canvas.offsetHeight * 2;
+            ctx.scale(2, 2);
+            
+            drawChart(ctx, canvas.offsetWidth, canvas.offsetHeight);
+            
+            // Add mouse event listeners
+            canvas.addEventListener('mousemove', handleMouseMove);
+            canvas.addEventListener('mouseleave', hideTooltip);
+        }
+
+        function drawChart(ctx, width, height) {
+            const data = stockData[currentTimeframe];
+            const padding = 40;
+            const chartWidth = width - 2 * padding;
+            const chartHeight = height - 2 * padding;
+            
+            // Clear canvas
+            ctx.clearRect(0, 0, width, height);
+            
+            // Find min and max prices
+            const prices = data.map(d => d.price);
+            const minPrice = Math.min(...prices);
+            const maxPrice = Math.max(...prices);
+            const priceRange = maxPrice - minPrice;
+            
+            // Draw grid
+            ctx.strokeStyle = '#333';
+            ctx.lineWidth = 1;
+            
+            // Horizontal grid lines
+            for (let i = 0; i <= 5; i++) {
+                const y = padding + (chartHeight / 5) * i;
+                ctx.beginPath();
+                ctx.moveTo(padding, y);
+                ctx.lineTo(width - padding, y);
+                ctx.stroke();
+                
+                // Price labels
+                const price = maxPrice - (priceRange / 5) * i;
+                ctx.fillStyle = '#666';
+                ctx.font = '12px Arial';
+                ctx.textAlign = 'right';
+                ctx.fillText('₹' + price.toFixed(0), padding - 10, y + 4);
+            }
+            
+            // Vertical grid lines
+            const timeStep = Math.floor(data.length / 6);
+            for (let i = 0; i <= 6; i++) {
+                const x = padding + (chartWidth / 6) * i;
+                ctx.beginPath();
+                ctx.moveTo(x, padding);
+                ctx.lineTo(x, height - padding);
+                ctx.stroke();
+            }
+            
+            // Draw price line
+            ctx.strokeStyle = '#22c55e';
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            
+            data.forEach((point, index) => {
+                const x = padding + (chartWidth / (data.length - 1)) * index;
+                const y = padding + chartHeight - ((point.price - minPrice) / priceRange) * chartHeight;
+                
+                if (index === 0) {
+                    ctx.moveTo(x, y);
+                } else {
+                    ctx.lineTo(x, y);
+                }
+            });
+            
+            ctx.stroke();
+            
+            // Draw gradient fill
+            const gradient = ctx.createLinearGradient(0, padding, 0, height - padding);
+            gradient.addColorStop(0, 'rgba(34, 197, 94, 0.3)');
+            gradient.addColorStop(1, 'rgba(34, 197, 94, 0.05)');
+            
+            ctx.fillStyle = gradient;
+            ctx.beginPath();
+            
+            data.forEach((point, index) => {
+                const x = padding + (chartWidth / (data.length - 1)) * index;
+                const y = padding + chartHeight - ((point.price - minPrice) / priceRange) * chartHeight;
+                
+                if (index === 0) {
+                    ctx.moveTo(x, y);
+                } else {
+                    ctx.lineTo(x, y);
+                }
+            });
+            
+            ctx.lineTo(width - padding, height - padding);
+            ctx.lineTo(padding, height - padding);
+            ctx.closePath();
+            ctx.fill();
+        }
+
+        function handleMouseMove(event) {
+            const canvas = document.getElementById('stockChart');
+            const rect = canvas.getBoundingClientRect();
+            const x = event.clientX - rect.left;
+            const y = event.clientY - rect.top;
+            
+            const data = stockData[currentTimeframe];
+            const padding = 40;
+            const chartWidth = canvas.offsetWidth - 2 * padding;
+            
+            if (x >= padding && x <= canvas.offsetWidth - padding) {
+                const dataIndex = Math.round(((x - padding) / chartWidth) * (data.length - 1));
+                const point = data[dataIndex];
+                
+                if (point) {
+                    showTooltip(event.clientX, event.clientY, point);
+                }
+            }
+        }
+
+        function showTooltip(x, y, point) {
+            const tooltip = document.getElementById('tooltip');
+            const timeStr = formatTime(point.time, currentTimeframe);
+            
+            tooltip.innerHTML = `
+                <div><strong>Time:</strong> ${timeStr}</div>
+                <div><strong>Price:</strong> ₹${point.price.toFixed(2)}</div>
+            `;
+            
+            tooltip.style.left = (x + 10) + 'px';
+            tooltip.style.top = (y - 10) + 'px';
+            tooltip.style.display = 'block';
+        }
+
+        function hideTooltip() {
+            document.getElementById('tooltip').style.display = 'none';
+        }
+
+        function formatTime(date, timeframe) {
+            if (timeframe === '1D') {
+                return date.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' });
+            } else {
+                return date.toLocaleDateString('en-IN');
+            }
+        }
+
+        function changeTimeframe(period) {
+            currentTimeframe = period;
+            
+            // Update active button
+            document.querySelectorAll('.time-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            // Redraw chart
+            const canvas = document.getElementById('stockChart');
+            const ctx = canvas.getContext('2d');
+            drawChart(ctx, canvas.offsetWidth, canvas.offsetHeight);
+        }
+
+        // Initialize chart when page loads
+        window.addEventListener('load', initChart);
+        window.addEventListener('resize', initChart);
+    </script>
+</body>
+</html>

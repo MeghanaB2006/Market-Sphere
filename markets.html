@@ -1,0 +1,687 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Markets - Stock Insights</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #1a1a1a;
+            color: #e0e0e0;
+            margin: 0;
+            padding: 0;
+            line-height: 1.6;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            margin: auto;
+            padding: 20px;
+        }
+
+        h1 {
+            font-size: 32px;
+            text-align: left;
+            color: #ff4d4d;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 15px;
+            overflow-x: auto;
+            padding: 10px 0;
+            scrollbar-width: none;
+        }
+
+        .tabs::-webkit-scrollbar {
+            display: none;
+        }
+
+        .tab {
+            background-color: #333;
+            border: 1px solid #555;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            color: #e0e0e0;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+        }
+
+        .tab.active, .tab:hover {
+            background-color: #ff4d4d;
+            color: #fff;
+            transform: scale(1.05);
+        }
+
+        .sub-tabs {
+            display: none;
+            margin-top: 10px;
+            padding: 10px;
+            border-bottom: 2px solid #444;
+            overflow-x: auto;
+            scrollbar-width: none;
+        }
+
+        .sub-tabs::-webkit-scrollbar {
+            display: none;
+        }
+
+        .sub-tab {
+            display: inline-block;
+            margin-right: 15px;
+            font-size: 14px;
+            color: #888;
+            cursor: pointer;
+            padding: 8px 12px;
+            border-bottom: 2px solid transparent;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+        }
+
+        .sub-tab.active, .sub-tab:hover {
+            color: #ff4d4d;
+            border-bottom: 2px solid #ff4d4d;
+            background-color: #2a2a2a;
+            border-radius: 5px;
+        }
+
+        .stocks-table {
+            width: 100%;
+            margin-top: 20px;
+            border-collapse: collapse;
+            display: none;
+            background-color: #222;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .stocks-table th, .stocks-table td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid #444;
+        }
+
+        .stocks-table th {
+            background-color: #ff4d4d;
+            color: #fff;
+            font-weight: bold;
+            text-transform: uppercase;
+            font-size: 14px;
+        }
+
+        .stocks-table td {
+            font-size: 14px;
+            color: #e0e0e0;
+        }
+
+        .stocks-table tr {
+            transition: background-color 0.3s ease;
+        }
+
+        .stocks-table tr:hover {
+            background-color: #333;
+        }
+
+        .change-positive {
+            color: #00cc00;
+            font-weight: bold;
+        }
+
+        .change-negative {
+            color: #ff3333;
+            font-weight: bold;
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 24px;
+            }
+
+            .tab {
+                font-size: 14px;
+                padding: 8px 15px;
+            }
+
+            .sub-tab {
+                font-size: 12px;
+                padding: 6px 10px;
+            }
+
+            .stocks-table th, .stocks-table td {
+                padding: 10px;
+                font-size: 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Stocks List</h1>
+
+        <div class="tabs">
+            <div class="tab" onclick="showSubTabs('nifty50')">Nifty 50</div>
+            <div class="tab" onclick="showSubTabs('bse')">BSE Sensex</div>
+            <div class="tab" onclick="showSubTabs('allStocks')">All Stocks</div>
+            <div class="tab" onclick="showSubTabs('fnolist')">F&O List</div>
+            <div class="tab" onclick="showSubTabs('indianIndices')">Indian Indices</div>
+            <div class="tab" onclick="showSubTabs('globalIndices')">Global Indices</div>
+            <div class="tab" onclick="showSubTabs('sectoralIndices')">Sectoral Indices</div>
+        </div>
+
+        <div class="sub-tabs" id="nifty50">
+            <span class="sub-tab" onclick="loadStocks('nifty50List')">Nifty 50 Stocks List</span>
+            <span class="sub-tab" onclick="loadStocks('nifty200List')">Nifty 200 Stock List</span>
+            <span class="sub-tab" onclick="loadStocks('nifty100List')">Nifty 100 Stock List</span>
+            <span class="sub-tab" onclick="loadStocks('niftyAutoStockList')">Nifty Auto Stock List</span>
+            <span class="sub-tab" onclick="loadStocks('niftyBankStockList')">Nifty Bank Stock List</span>
+            <span class="sub-tab" onclick="loadStocks('niftyCommoditiesStockList')">Nifty Commodities Stock List</span>
+            <span class="sub-tab" onclick="loadStocks('niftyConsumerDurablesStockList')">Nifty Consumer Durables Stock List</span>
+            <span class="sub-tab" onclick="loadStocks('niftyConsumptionStockList')">Nifty Consumption Stock List</span>
+            <span class="sub-tab" onclick="loadStocks('niftyFinancialServicesStockList')">Nifty Financial Services Stock List</span>
+            <span class="sub-tab" onclick="loadStocks('niftyMediaStockList')">Nifty Media Stock List</span>
+            <span class="sub-tab" onclick="loadStocks('niftyServicesSectorStockList')">Nifty Services Sector Stock List</span>
+            <span class="sub-tab" onclick="loadStocks('niftyPrivateBankStockList')">Nifty Private Bank Stock List</span>
+        </div>
+
+        <div class="sub-tabs" id="bse">
+            <span class="sub-tab" onclick="loadStocks('bse30')">BSE Sensex Stocks List</span>
+            <span class="sub-tab" onclick="loadStocks('bse500')">BSE IT Stocks List</span>
+            <span class="sub-tab" onclick="loadStocks('bseMidcap')">BSE Bankex Stocks List</span>
+            <span class="sub-tab" onclick="loadStocks('bseSmallcap')">BSE Healthcare Stocks List</span>
+            <span class="sub-tab" onclick="loadStocks('bseMidCap')">BSE Mid Cap Stocks List</span>
+        </div>
+
+        <div class="sub-tabs" id="allStocks">
+            <span class="sub-tab" onclick="loadStocks('A')">A</span>
+            <span class="sub-tab" onclick="loadStocks('B')">B</span>
+            <span class="sub-tab" onclick="loadStocks('C')">C</span>
+            <span class="sub-tab" onclick="loadStocks('D')">D</span>
+            <span class="sub-tab" onclick="loadStocks('E')">E</span>
+            <span class="sub-tab" onclick="loadStocks('F')">F</span>
+            <span class="sub-tab" onclick="loadStocks('G')">G</span>
+            <span class="sub-tab" onclick="loadStocks('H')">H</span>
+            <span class="sub-tab" onclick="loadStocks('I')">I</span>
+            <span class="sub-tab" onclick="loadStocks('J')">J</span>
+            <span class="sub-tab" onclick="loadStocks('K')">K</span>
+            <span class="sub-tab" onclick="loadStocks('L')">L</span>
+            <span class="sub-tab" onclick="loadStocks('M')">M</span>
+            <span class="sub-tab" onclick="loadStocks('N')">N</span>
+            <span class="sub-tab" onclick="loadStocks('O')">O</span>
+            <span class="sub-tab" onclick="loadStocks('P')">P</span>
+            <span class="sub-tab" onclick="loadStocks('Q')">Q</span>
+            <span class="sub-tab" onclick="loadStocks('R')">R</span>
+            <span class="sub-tab" onclick="loadStocks('S')">S</span>
+            <span class="sub-tab" onclick="loadStocks('T')">T</span>
+            <span class="sub-tab" onclick="loadStocks('U')">U</span>
+            <span class="sub-tab" onclick="loadStocks('V')">V</span>
+            <span class="sub-tab" onclick="loadStocks('W')">W</span>
+            <span class="sub-tab" onclick="loadStocks('X')">X</span>
+            <span class="sub-tab" onclick="loadStocks('Y')">Y</span>
+            <span class="sub-tab" onclick="loadStocks('Z')">Z</span>
+        </div>
+
+        <div class="sub-tabs" id="fnolist">
+            <span class="sub-tab" onclick="loadStocks('futures')">Futures</span>
+            <span class="sub-tab" onclick="loadStocks('options')">Options</span>
+        </div>
+
+        <div class="sub-tabs" id="indianIndices">
+            <span class="sub-tab" onclick="loadStocks('indianIndicesList')">Indian Indices List</span>
+        </div>
+
+        <div class="sub-tabs" id="globalIndices">
+            <span class="sub-tab" onclick="loadStocks('globalIndicesList')">Global Indices List</span>
+        </div>
+
+        <div class="sub-tabs" id="sectoralIndices">
+            <span class="sub-tab" onclick="loadStocks('sectoralIndicesList')">Sectoral Indices List</span>
+        </div>
+
+        <table class="stocks-table" id="stocks-table">
+            <thead>
+                <tr>
+                    <th>Company</th>
+                    <th>LTP</th>
+                    <th>Market Cap (Cr.)</th>
+                    <th>PE Ratio</th>
+                    <th>Change</th>
+                </tr>
+            </thead>
+            <tbody id="stock-data"></tbody>
+        </table>
+    </div>
+
+    <script>
+        // Complete stock mappings with sample data
+        const stockMappings = {
+            nifty50List: [
+                { company: "Reliance Industries", symbol: "RELIANCE.NS" },
+                { company: "HDFC Bank", symbol: "HDFCBANK.NS" },
+                { company: "Infosys", symbol: "INFY.NS" },
+                { company: "TCS", symbol: "TCS.NS" },
+                { company: "Larsen & Toubro", symbol: "LT.NS" },
+                { company: "Hindustan Unilever", symbol: "HINDUNILVR.NS" },
+                { company: "ICICI Bank", symbol: "ICICIBANK.NS" },
+                { company: "Kotak Mahindra Bank", symbol: "KOTAKBANK.NS" },
+                { company: "State Bank of India", symbol: "SBIN.NS" },
+                { company: "Asian Paints", symbol: "ASIANPAINT.NS" }
+            ],
+            nifty200List: [
+                { company: "Tata Steel", symbol: "TATASTEEL.NS" },
+                { company: "Adani Ports", symbol: "ADANIPORTS.NS" },
+                { company: "Ambuja Cements", symbol: "AMBUJACEM.NS" },
+                { company: "Bharat Electronics", symbol: "BEL.NS" },
+                { company: "JSW Steel", symbol: "JSWSTEEL.NS" },
+                { company: "NTPC", symbol: "NTPC.NS" },
+                { company: "Oil & Natural Gas Corp", symbol: "ONGC.NS" },
+                { company: "Power Grid Corporation", symbol: "POWERGRID.NS" },
+                { company: "Coal India", symbol: "COALINDIA.NS" },
+                { company: "Grasim Industries", symbol: "GRASIM.NS" }
+            ],
+            nifty100List: [
+                { company: "Bharti Airtel", symbol: "BHARTIARTL.NS" },
+                { company: "ITC", symbol: "ITC.NS" },
+                { company: "UltraTech Cement", symbol: "ULTRACEMCO.NS" },
+                { company: "Divi's Laboratories", symbol: "DIVISLAB.NS" },
+                { company: "Dr. Reddy's Laboratories", symbol: "DRREDDY.NS" },
+                { company: "Sun Pharmaceutical", symbol: "SUNPHARMA.NS" },
+                { company: "Asian Paints", symbol: "ASIANPAINT.NS" },
+                { company: "Titan Company", symbol: "TITAN.NS" },
+                { company: "Nestle India", symbol: "NESTLEIND.NS" },
+                { company: "Tata Consultancy Services", symbol: "TCS.NS" }
+            ],
+            niftyAutoStockList: [
+                { company: "Maruti Suzuki", symbol: "MARUTI.NS" },
+                { company: "Tata Motors", symbol: "TATAMOTORS.NS" },
+                { company: "Eicher Motors", symbol: "EICHERMOT.NS" },
+                { company: "Bajaj Auto", symbol: "BAJAJ-AUTO.NS" },
+                { company: "Hero MotoCorp", symbol: "HEROMOTOCO.NS" },
+                { company: "TVS Motor Company", symbol: "TVSMOTOR.NS" },
+                { company: "Ashok Leyland", symbol: "ASHOKLEY.NS" },
+                { company: "Mahindra & Mahindra", symbol: "M&M.NS" }
+            ],
+            niftyBankStockList: [
+                { company: "ICICI Bank", symbol: "ICICIBANK.NS" },
+                { company: "HDFC Bank", symbol: "HDFCBANK.NS" },
+                { company: "Kotak Mahindra Bank", symbol: "KOTAKBANK.NS" },
+                { company: "State Bank of India", symbol: "SBIN.NS" },
+                { company: "Axis Bank", symbol: "AXISBANK.NS" },
+                { company: "IndusInd Bank", symbol: "INDUSINDBK.NS" },
+                { company: "Federal Bank", symbol: "FEDERALBNK.NS" },
+                { company: "Bandhan Bank", symbol: "BANDHANBNK.NS" }
+            ],
+            niftyCommoditiesStockList: [
+                { company: "JSW Steel", symbol: "JSWSTEEL.NS" },
+                { company: "Hindalco Industries", symbol: "HINDALCO.NS" },
+                { company: "Grasim Industries", symbol: "GRASIM.NS" },
+                { company: "Vedanta Limited", symbol: "VEDL.NS" },
+                { company: "NMDC", symbol: "NMDC.NS" },
+                { company: "Coal India", symbol: "COALINDIA.NS" },
+                { company: "Steel Authority of India", symbol: "SAIL.NS" },
+                { company: "Bharat Forge", symbol: "BHARATFORG.NS" }
+            ],
+            niftyConsumerDurablesStockList: [
+                { company: "Titan Company", symbol: "TITAN.NS" },
+                { company: "Voltas", symbol: "VOLTAS.NS" },
+                { company: "Blue Star", symbol: "BLUESTARCO.NS" },
+                { company: "Godrej Consumer Products", symbol: "GODREJCP.NS" },
+                { company: "Whirlpool India", symbol: "WHIRLPOOL.NS" },
+                { company: "Havells India", symbol: "HAVELLS.NS" },
+                { company: "Eicher Motors", symbol: "EICHERMOT.NS" },
+                { company: "Bajaj Electricals", symbol: "BAJAJELEC.NS" }
+            ],
+            niftyConsumptionStockList: [
+                { company: "Nestle India", symbol: "NESTLEIND.NS" },
+                { company: "Hindustan Unilever", symbol: "HINDUNILVR.NS" },
+                { company: "Dabur India", symbol: "DABUR.NS" },
+                { company: "Britannia Industries", symbol: "BRITANNIA.NS" },
+                { company: "Colgate-Palmolive India", symbol: "COLPAL.NS" },
+                { company: "Marico", symbol: "MARICO.NS" },
+                { company: "Godrej Consumer Products", symbol: "GODREJCP.NS" },
+                { company: "Titan Company", symbol: "TITAN.NS" }
+            ],
+            niftyFinancialServicesStockList: [
+                { company: "Bajaj Finance", symbol: "BAJFINANCE.NS" },
+                { company: "HDFC Ltd", symbol: "HDFC.NS" },
+                { company: "Bajaj Finserv", symbol: "BAJAJFINSV.NS" },
+                { company: "Housing Development Finance Corporation", symbol: "HDFC.NS" },
+                { company: "ICICI Lombard", symbol: "ICICIGI.NS" },
+                { company: "Kotak Mahindra Life Insurance", symbol: "KOTAKLIFE.NS" },
+                { company: "SBI Life Insurance", symbol: "SBILIFE.NS" },
+                { company: "Muthoot Finance", symbol: "MUTHOOTFIN.NS" }
+            ],
+            niftyMediaStockList: [
+                { company: "Zee Entertainment", symbol: "ZEEL.NS" },
+                { company: "Sun TV Network", symbol: "SUNTV.NS" },
+                { company: "TV18 Broadcast", symbol: "TV18BRDCST.NS" },
+                { company: "Network18", symbol: "NETWORK18.NS" },
+                { company: "Jagran Prakashan", symbol: "JAGRAN.NS" },
+                { company: "Inox Leisure", symbol: "INOXLEISUR.NS" },
+                { company: "PVR", symbol: "PVR.NS" },
+                { company: "Balaji Telefilms", symbol: "BALAJITELE.NS" }
+            ],
+            niftyServicesSectorStockList: [
+                { company: "HCL Technologies", symbol: "HCLTECH.NS" },
+                { company: "Wipro", symbol: "WIPRO.NS" },
+                { company: "Tech Mahindra", symbol: "TECHM.NS" },
+                { company: "L&T Infotech", symbol: "LTI.NS" },
+                { company: "Mindtree", symbol: "MINDTREE.NS" },
+                { company: "Coforge", symbol: "COFORGE.NS" },
+                { company: "Persistent Systems", symbol: "PERSISTENT.NS" },
+                { company: "Mphasis", symbol: "MPHASIS.NS" }
+            ],
+            niftyPrivateBankStockList: [
+                { company: "Axis Bank", symbol: "AXISBANK.NS" },
+                { company: "IndusInd Bank", symbol: "INDUSINDBK.NS" },
+                { company: "IDFC First Bank", symbol: "IDFCFIRSTB.NS" },
+                { company: "Bandhan Bank", symbol: "BANDHANBNK.NS" },
+                { company: "RBL Bank", symbol: "RBLBANK.NS" },
+                { company: "Yes Bank", symbol: "YESBANK.NS" },
+                { company: "Federal Bank", symbol: "FEDERALBNK.NS" },
+                { company: "Karur Vysya Bank", symbol: "KVB.NS" }
+            ],
+            // BSE Stock Lists
+            bse30: [
+                { company: "TCS", symbol: "TCS.NS" },
+                { company: "Reliance Industries", symbol: "RELIANCE.NS" },
+                { company: "HDFC Bank", symbol: "HDFCBANK.NS" },
+                { company: "Infosys", symbol: "INFY.NS" },
+                { company: "ICICI Bank", symbol: "ICICIBANK.NS" }
+            ],
+            bse500: [
+                { company: "TCS", symbol: "TCS.NS" },
+                { company: "Infosys", symbol: "INFY.NS" },
+                { company: "Wipro", symbol: "WIPRO.NS" },
+                { company: "HCL Technologies", symbol: "HCLTECH.NS" },
+                { company: "Tech Mahindra", symbol: "TECHM.NS" }
+            ],
+            bseMidcap: [
+                { company: "HDFC Bank", symbol: "HDFCBANK.NS" },
+                { company: "ICICI Bank", symbol: "ICICIBANK.NS" },
+                { company: "Axis Bank", symbol: "AXISBANK.NS" },
+                { company: "Kotak Mahindra Bank", symbol: "KOTAKBANK.NS" },
+                { company: "State Bank of India", symbol: "SBIN.NS" }
+            ],
+            bseSmallcap: [
+                { company: "Sun Pharmaceutical", symbol: "SUNPHARMA.NS" },
+                { company: "Dr. Reddy's Laboratories", symbol: "DRREDDY.NS" },
+                { company: "Cipla", symbol: "CIPLA.NS" },
+                { company: "Aurobindo Pharma", symbol: "AUROPHARMA.NS" },
+                { company: "Lupin", symbol: "LUPIN.NS" }
+            ],
+            bseMidCap: [
+                { company: "Godrej Properties", symbol: "GODREJPROP.NS" },
+                { company: "Phoenix Mills", symbol: "PFS.NS" },
+                { company: "Oberoi Realty", symbol: "OBEROIRLTY.NS" },
+                { company: "DLF", symbol: "DLF.NS" },
+                { company: "Prestige Estates", symbol: "PRESTIGE.NS" }
+            ],
+            // Alphabetical stock lists (sample data)
+            A: [
+                { company: "Asian Paints", symbol: "ASIANPAINT.NS" },
+                { company: "Axis Bank", symbol: "AXISBANK.NS" },
+                { company: "Adani Ports", symbol: "ADANIPORTS.NS" },
+                { company: "ACC Limited", symbol: "ACC.NS" },
+                { company: "Apollo Hospitals", symbol: "APOLLOHOSP.NS" }
+            ],
+            B: [
+                { company: "Bharti Airtel", symbol: "BHARTIARTL.NS" },
+                { company: "Bajaj Finance", symbol: "BAJFINANCE.NS" },
+                { company: "Bajaj Auto", symbol: "BAJAJ-AUTO.NS" },
+                { company: "BPCL", symbol: "BPCL.NS" },
+                { company: "Britannia Industries", symbol: "BRITANNIA.NS" }
+            ],
+            C: [
+                { company: "Cipla", symbol: "CIPLA.NS" },
+                { company: "Coal India", symbol: "COALINDIA.NS" },
+                { company: "Colgate-Palmolive", symbol: "COLPAL.NS" },
+                { company: "Coforge", symbol: "COFORGE.NS" },
+                { company: "Container Corporation", symbol: "CONCOR.NS" }
+            ],
+            
+    "D": [
+        { "company": "Dr. Reddy's Labs", "symbol": "DRREDDY.NS" },
+        { "company": "Dabur India", "symbol": "DABUR.NS" },
+        { "company": "Divi's Labs", "symbol": "DIVISLAB.NS" },
+        { "company": "Dixon Technologies", "symbol": "DIXON.NS" },
+        { "company": "Delta Corp", "symbol": "DELTACORP.NS" }
+    ],
+    "E": [
+        { "company": "Eicher Motors", "symbol": "EICHERMOT.NS" },
+        { "company": "Escorts Kubota", "symbol": "ESCORTS.NS" }
+    ],
+    "F": [
+        { "company": "Federal Bank", "symbol": "FEDERALBNK.NS" },
+        { "company": "Finolex Cables", "symbol": "FINCABLES.NS" },
+        { "company": "Firstsource Solutions", "symbol": "FSL.NS" }
+    ],
+    "G": [
+        { "company": "GAIL India", "symbol": "GAIL.NS" },
+        { "company": "Godrej Consumer", "symbol": "GODREJCP.NS" },
+        { "company": "Granules India", "symbol": "GRANULES.NS" },
+        { "company": "Glenmark Pharma", "symbol": "GLENMARK.NS" }
+    ],
+    "H": [
+        { "company": "HDFC Life", "symbol": "HDFCLIFE.NS" },
+        { "company": "HDFC Bank", "symbol": "HDFCBANK.NS" },
+        { "company": "Hindustan Unilever", "symbol": "HINDUNILVR.NS" },
+        { "company": "Hero MotoCorp", "symbol": "HEROMOTOCO.NS" },
+        { "company": "Havells India", "symbol": "HAVELLS.NS" },
+        { "company": "Hindalco Industries", "symbol": "HINDALCO.NS" }
+    ],
+    "I": [
+        { "company": "ITC", "symbol": "ITC.NS" },
+        { "company": "ICICI Bank", "symbol": "ICICIBANK.NS" },
+        { "company": "ICICI Lombard", "symbol": "ICICIGI.NS" },
+        { "company": "Infosys", "symbol": "INFY.NS" },
+        { "company": "IndusInd Bank", "symbol": "INDUSINDBK.NS" },
+        { "company": "IDFC First Bank", "symbol": "IDFCFIRSTB.NS" },
+        { "company": "Indiabulls Housing Finance", "symbol": "IBULHSGFIN.NS" }
+    ],
+    "J": [
+        { "company": "Jindal Steel", "symbol": "JINDALSTEL.NS" },
+        { "company": "JSW Steel", "symbol": "JSWSTEEL.NS" },
+        { "company": "Jubilant FoodWorks", "symbol": "JUBLFOOD.NS" }
+    ],
+    "K": [
+        { "company": "Kotak Mahindra Bank", "symbol": "KOTAKBANK.NS" },
+        { "company": "Kansai Nerolac Paints", "symbol": "KANSAINER.NS" },
+        { "company": "KEI Industries", "symbol": "KEI.NS" }
+    ],
+    "L": [
+        { "company": "L&T", "symbol": "LT.NS" },
+        { "company": "LIC Housing Finance", "symbol": "LICHSGFIN.NS" },
+        { "company": "Lupin Ltd", "symbol": "LUPIN.NS" },
+        { "company": "LTI Mindtree", "symbol": "LTIM.NS" }
+    ],
+    "M": [
+        { "company": "Maruti Suzuki", "symbol": "MARUTI.NS" },
+        { "company": "Mahindra & Mahindra", "symbol": "M&M.NS" },
+        { "company": "Mphasis", "symbol": "MPHASIS.NS" },
+        { "company": "Mindtree", "symbol": "MTCL.NS" },
+        { "company": "Muthoot Finance", "symbol": "MUTHOOTFIN.NS" }
+    ],
+    "N": [
+        { "company": "Nestle India", "symbol": "NESTLEIND.NS" },
+        { "company": "NTPC", "symbol": "NTPC.NS" },
+        { "company": "NMDC", "symbol": "NMDC.NS" },
+        { "company": "NLC India", "symbol": "NLCINDIA.NS" }
+    ],
+    "O": [
+        { "company": "ONGC", "symbol": "ONGC.NS" }
+    ],
+    "P": [
+        { "company": "Power Grid", "symbol": "POWERGRID.NS" },
+        { "company": "Pidilite Industries", "symbol": "PIDILITIND.NS" },
+        { "company": "Punjab National Bank", "symbol": "PNB.NS" },
+        { "company": "Page Industries", "symbol": "PAGEIND.NS" },
+        { "company": "PNC Infratech", "symbol": "PNCINFRA.NS" }
+    ],
+    "Q": [
+        { "company": "Quess Corp", "symbol": "QUESS.NS" }
+    ],
+    "R": [
+        { "company": "Reliance Industries", "symbol": "RELIANCE.NS" },
+        { "company": "RBL Bank", "symbol": "RBLBANK.NS" },
+        { "company": "Rajesh Exports", "symbol": "RAJESHEXPO.NS" },
+        { "company": "Rain Industries", "symbol": "RAIN.NS" }
+    ],
+    "S": [
+        { "company": "SBI", "symbol": "SBIN.NS" },
+        { "company": "Siemens", "symbol": "SIEMENS.NS" },
+        { "company": "Sun Pharma", "symbol": "SUNPHARMA.NS" },
+        { "company": "SRF Ltd", "symbol": "SRF.NS" },
+        { "company": "Steel Authority of India", "symbol": "SAIL.NS" }
+    ],
+    "T": [
+        { "company": "Tata Motors", "symbol": "TATAMOTORS.NS" },
+        { "company": "Tata Steel", "symbol": "TATASTEEL.NS" },
+        { "company": "TCS", "symbol": "TCS.NS" },
+        { "company": "Tech Mahindra", "symbol": "TECHM.NS" },
+        { "company": "Torrent Power", "symbol": "TORNTPOWER.NS" }
+    ],
+    "U": [
+        { "company": "UltraTech Cement", "symbol": "ULTRACEMCO.NS" },
+        { "company": "Union Bank of India", "symbol": "UNIONBANK.NS" },
+        { "company": "Ujjivan Small Finance Bank", "symbol": "UJJIVANSFB.NS" }
+    ],
+    "V": [
+        { "company": "Vedanta", "symbol": "VEDL.NS" },
+        { "company": "Varun Beverages", "symbol": "VBL.NS" },
+        { "company": "Voltas", "symbol": "VOLTAS.NS" }
+    ],
+    "W": [
+        { "company": "Wipro", "symbol": "WIPRO.NS" },
+        { "company": "Welspun Corp", "symbol": "WELCORP.NS" }
+    ],
+    "X": [
+        { "company": "Xpro India", "symbol": "XPROINDIA.NS" }
+    ],
+    "Y": [
+        { "company": "Yes Bank", "symbol": "YESBANK.NS" }
+    ],
+    "Z": [
+        { "company": "Zee Entertainment", "symbol": "ZEEL.NS" },
+        { "company": "Zomato", "symbol": "ZOMATO.NS" }
+    ],
+
+            // F&O Lists
+            futures: [
+                { company: "Nifty Futures", symbol: "NIFTY-FUT" },
+                { company: "Bank Nifty Futures", symbol: "BANKNIFTY-FUT" },
+                { company: "Reliance Futures", symbol: "RELIANCE-FUT" },
+                { company: "TCS Futures", symbol: "TCS-FUT" },
+                { company: "HDFC Bank Futures", symbol: "HDFCBANK-FUT" }
+            ],
+            options: [
+                { company: "Nifty Options", symbol: "NIFTY-OPT" },
+                { company: "Bank Nifty Options", symbol: "BANKNIFTY-OPT" },
+                { company: "Reliance Options", symbol: "RELIANCE-OPT" },
+                { company: "TCS Options", symbol: "TCS-OPT" },
+                { company: "HDFC Bank Options", symbol: "HDFCBANK-OPT" }
+            ],
+            // Indices Lists
+            indianIndicesList: [
+                { company: "Nifty 50", symbol: "NIFTY50" },
+                { company: "Sensex", symbol: "SENSEX" },
+                { company: "Nifty Bank", symbol: "NIFTYBANK" },
+                { company: "Nifty IT", symbol: "NIFTYIT" },
+                { company: "Nifty Auto", symbol: "NIFTYAUTO" }
+            ],
+            globalIndicesList: [
+                { company: "S&P 500", symbol: "SPX" },
+                { company: "Nasdaq", symbol: "NASDAQ" },
+                { company: "Dow Jones", symbol: "DJI" },
+                { company: "FTSE 100", symbol: "FTSE" },
+                { company: "Nikkei 225", symbol: "NIKKEI" }
+            ],
+            sectoralIndicesList: [
+                { company: "Nifty FMCG", symbol: "NIFTYFMCG" },
+                { company: "Nifty Pharma", symbol: "NIFTYPHARMA" },
+                { company: "Nifty Metal", symbol: "NIFTYMETAL" },
+                { company: "Nifty Energy", symbol: "NIFTYENERGY" },
+                { company: "Nifty Realty", symbol: "NIFTYREALTY" }
+            ]
+        };
+
+        // Function to generate random realistic stock data
+        function generateStockData() {
+            const basePrice = Math.random() * 5000 + 100; // Random price between 100-5100
+            const change = (Math.random() - 0.5) * 10; // Random change between -5% to +5%
+            const marketCap = Math.random() * 500000 + 1000; // Random market cap
+            const peRatio = Math.random() * 50 + 5; // Random P/E ratio
+
+            return {
+                ltp: `₹${basePrice.toFixed(2)}`,
+                marketCap: `₹${(marketCap).toFixed(0)} Cr`,
+                peRatio: peRatio.toFixed(2),
+                change: `${change >= 0 ? '+' : ''}${change.toFixed(2)}%`
+            };
+        }
+
+        function showSubTabs(tabId) {
+            // Hide all sub-tabs
+            document.querySelectorAll('.sub-tabs').forEach(tab => tab.style.display = 'none');
+            // Remove active class from all main tabs
+            document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+            // Show selected sub-tab
+            document.getElementById(tabId).style.display = 'block';
+            // Add active class to clicked tab
+            document.querySelector(`[onclick="showSubTabs('${tabId}')"]`).classList.add('active');
+            // Remove active class from all sub-tabs
+            document.querySelectorAll('.sub-tab').forEach(subTab => subTab.classList.remove('active'));
+            // Hide the table initially
+            document.getElementById('stocks-table').style.display = 'none';
+        }
+
+        function loadStocks(listId) {
+            // Remove active class from all sub-tabs
+            document.querySelectorAll('.sub-tab').forEach(subTab => subTab.classList.remove('active'));
+            // Add active class to clicked sub-tab
+            document.querySelector(`[onclick="loadStocks('${listId}')"]`).classList.add('active');
+            // Show the table
+            document.getElementById('stocks-table').style.display = 'table';
+
+            const stocks = stockMappings[listId] || [];
+            const tbody = document.getElementById('stock-data');
+            tbody.innerHTML = '';
+
+            // If no stocks found, show a message
+            if (stocks.length === 0) {
+                const row = document.createElement('tr');
+                row.innerHTML = `<td colspan="5" style="text-align: center; color: #888;">No data available for this category</td>`;
+                tbody.appendChild(row);
+                return;
+            }
+
+            // Populate table with stock data
+            stocks.forEach(stock => {
+                const stockData = generateStockData();
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${stock.company}</td>
+                    <td>${stockData.ltp}</td>
+                    <td>${stockData.marketCap}</td>
+                    <td>${stockData.peRatio}</td>
+                    <td class="${stockData.change.includes('-') ? 'change-negative' : 'change-positive'}">${stockData.change}</td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Market Sphere</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f0ecec;
+        }
+        header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        header a {
+            text-decoration: none;
+            color: #007bff;
+        }
+        .form-section, .dashboard-section {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+            display: none;
+        }
+        .form-section.active, .dashboard-section.active {
+            display: block;
+        }
+        h2 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input, select {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        .form-row {
+            display: flex;
+            gap: 20px;
+        }
+        .form-row .form-group {
+            flex: 1;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-right: 10px;
+        }
+        button:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
+        button:hover:not(:disabled) {
+            background-color: #0056b3;
+        }
+        .stock-list, .order-details {
+            margin-top: 20px;
+        }
+        .stock-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+        }
+        .order-details p {
+            margin: 5px 0;
+        }
+        .error {
+            color: red;
+            font-size: 0.9em;
+            margin-top: 5px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Market Sphere</h1>
+        <a href="homepage.html">← Back to Home</a>
+    </header>
+
+    <section id="personal-info" class="form-section active">
+        <h2>Personal Information</h2>
+        <p>Let's start with your basic details</p>
+        <div class="form-row">
+            <div class="form-group">
+                <label for="first-name">First Name</label>
+                <input type="text" id="first-name" required>
+                <div class="error" id="first-name-error">First name is required</div>
+            </div>
+            <div class="form-group">
+                <label for="last-name">Last Name</label>
+                <input type="text" id="last-name" required>
+                <div class="error" id="last-name-error">Last name is required</div>
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="email">Email Address</label>
+            <input type="email" id="email" required>
+            <div class="error" id="email-error">Valid email is required</div>
+        </div>
+        <div class="form-group">
+            <label for="phone">Phone Number</label>
+            <input type="tel" id="phone" required>
+            <div class="error" id="phone-error">Phone number is required</div>
+        </div>
+        <div class="form-group">
+            <label for="dob">Date of Birth</label>
+            <input type="date" id="dob" required>
+            <div class="error" id="dob-error">Date of birth is required</div>
+        </div>
+        <button onclick="nextSection('personal-info', 'account-setup')">Continue</button>
+    </section>
+
+    <section id="account-setup" class="form-section">
+        <h2>Account Setup</h2>
+        <p>Configure your trading account</p>
+        <div class="form-group">
+            <label for="account-type">Account Type</label>
+            <select id="account-type" required>
+                <option value="">Select Account Type</option>
+                <option value="individual">Individual</option>
+                <option value="joint">Joint Account</option>
+                <option value="corporate">Corporate</option>
+            </select>
+            <div class="error" id="account-type-error">Account type is required</div>
+        </div>
+        <div class="form-group">
+            <label for="initial-deposit">Initial Deposit (USD)</label>
+            <input type="number" id="initial-deposit" min="0" step="0.01" required>
+            <div class="error" id="initial-deposit-error">Initial deposit is required</div>
+        </div>
+        <div class="form-group">
+            <label for="trading-experience">Trading Experience</label>
+            <select id="trading-experience" required>
+                <option value="">Select Experience Level</option>
+                <option value="beginner">Beginner (0-1 years)</option>
+                <option value="intermediate">Intermediate (1-5 years)</option>
+                <option value="advanced">Advanced (5+ years)</option>
+            </select>
+            <div class="error" id="trading-experience-error">Trading experience is required</div>
+        </div>
+        <div class="form-group">
+            <label for="risk-tolerance">Risk Tolerance</label>
+            <select id="risk-tolerance" required>
+                <option value="">Select Risk Level</option>
+                <option value="conservative">Conservative</option>
+                <option value="moderate">Moderate</option>
+                <option value="aggressive">Aggressive</option>
+            </select>
+            <div class="error" id="risk-tolerance-error">Risk tolerance is required</div>
+        </div>
+        <button onclick="previousSection('account-setup', 'personal-info')">Previous</button>
+        <button onclick="nextSection('account-setup', 'account-summary')">Continue</button>
+    </section>
+
+    <section id="account-summary" class="form-section">
+        <h2>Account Summary</h2>
+        <p>Review your information and complete setup</p>
+        <div id="summary-content"></div>
+        <button onclick="previousSection('account-summary', 'account-setup')">Previous</button>
+        <button onclick="nextSection('account-summary', 'trading-dashboard')">Create Account</button>
+    </section>
+
+    <section id="trading-dashboard" class="dashboard-section">
+        <h2>Welcome to Trading Dashboard</h2>
+        <p>Your account is ready. Start investing today!</p>
+        <div class="form-row">
+            <div class="form-group">
+                <label>Account Number</label>
+                <p>MST-2025-001</p>
+            </div>
+            <div class="form-group">
+                <label>Available Balance</label>
+                <p id="balance">$5,000.00</p>
+            </div>
+            <div class="form-group">
+                <label>Portfolio Value</label>
+                <p>$0.00</p>
+            </div>
+            <div class="form-group">
+                <label>Account Status</label>
+                <p>Active</p>
+            </div>
+        </div>
+        <div class="stock-list">
+            <h3>Available Stocks</h3>
+            <div class="stock-item">
+                <div>
+                    <strong>Apple Inc.</strong><br>AAPL
+                </div>
+                <div>
+                    $175.25<br><span style="color: green;">+2.1%</span>
+                </div>
+            </div>
+            <div class="stock-item">
+                <div>
+                    <strong>Tesla Inc.</strong><br>TSLA
+                </div>
+                <div>
+                    $248.50<br><span style="color: red;">-1.2%</span>
+                </div>
+            </div>
+            <div class="stock-item">
+                <div>
+                    <strong>Microsoft Corp.</strong><br>MSFT
+                </div>
+                <div>
+                    $420.75<br><span style="color: green;">+1.8%</span>
+                </div>
+            </div>
+            <div class="stock-item">
+                <div>
+                    <strong>Alphabet Inc.</strong><br>GOOGL
+                </div>
+                <div>
+                    $142.85<br><span style="color: green;">+0.9%</span>
+                </div>
+            </div>
+            <div class="stock-item">
+                <div>
+                    <strong>Amazon.com Inc.</strong><br>AMZN
+                </div>
+                <div>
+                    $165.20<br><span style="color: green;">+2.5%</span>
+                </div>
+            </div>
+        </div>
+        <div class="order-details">
+            <h3>Place Order</h3>
+            <div class="form-group">
+                <label for="stock-select">Select a stock to trade</label>
+                <select id="stock-select" onchange="updateOrderDetails()">
+                    <option value="">Select a Stock</option>
+                    <option value="AAPL|175.25">Apple Inc. (AAPL)</option>
+                    <option value="TSLA|248.50">Tesla Inc. (TSLA)</option>
+                    <option value="MSFT|420.75">Microsoft Corp. (MSFT)</option>
+                    <option value="GOOGL|142.85">Alphabet Inc. (GOOGL)</option>
+                    <option value="AMZN|165.20">Amazon.com Inc. (AMZN)</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="order-type">Order Type</label>
+                <select id="order-type" onchange="updateOrderDetails()">
+                    <option value="market">Market Order</option>
+                    <option value="limit">Limit Order</option>
+                </select>
+            </div>
+            <div class="form-group" id="limit-price-group" style="display: none;">
+                <label for="limit-price">Limit Price ($)</label>
+                <input type="number" id="limit-price" min="0" step0.01">
+            </div>
+            <div class="form-group">
+                <label for="quantity">Quantity (Shares)</label>
+                <input type="number" id="quantity" min="1" step="1" oninput="updateOrderDetails()">
+            </div>
+            <div class="order-details">
+                <p>Shares: <span id="order-shares">0</span></p>
+                <p>Price per Share: $<span id="order-price">0.00</span></p>
+                <p>Commission: $<span id="order-commission">0.00</span></p>
+                <p>Total Cost: $<span id="order-total">0.00</span></p>
+            </div>
+            <button id="place-order" disabled onclick="Buynow()">Buy Now</button>
+        </div>
+    </section>
+
+    <script>
+        function validateSection(sectionId) {
+            const inputs = document.querySelectorAll(`#${sectionId} [required]`);
+            let isValid = true;
+            inputs.forEach(input => {
+                const errorElement = document.getElementById(`${input.id}-error`);
+                if (!input.value.trim()) {
+                    errorElement.style.display = 'block';
+                    isValid = false;
+                } else {
+                    errorElement.style.display = 'none';
+                }
+                if (input.type === 'email' && input.value && !/^\S+@\S+\.\S+$/.test(input.value)) {
+                    errorElement.textContent = 'Please enter a valid email';
+                    errorElement.style.display = 'block';
+                    isValid = false;
+                }
+            });
+            return isValid;
+        }
+
+        function nextSection(currentId, nextId) {
+            if (validateSection(currentId)) {
+                document.getElementById(currentId).classList.remove('active');
+                document.getElementById(nextId).classList.add('active');
+                if (nextId === 'account-summary') {
+                    displaySummary();
+                }
+                if (nextId === 'trading-dashboard') {
+                    updateBalance();
+                }
+            }
+        }
+
+        function previousSection(currentId, prevId) {
+            document.getElementById(currentId).classList.remove('active');
+            document.getElementById(prevId).classList.add('active');
+        }
+
+        function displaySummary() {
+            const firstName = document.getElementById('first-name').value;
+            const lastName = document.getElementById('last-name').value;
+            const email = document.getElementById('email').value;
+            const phone = document.getElementById('phone').value;
+            const dob = document.getElementById('dob').value;
+            const accountType = document.getElementById('account-type').value;
+            const initialDeposit = document.getElementById('initial-deposit').value;
+            const tradingExperience = document.getElementById('trading-experience').value;
+            const riskTolerance = document.getElementById('risk-tolerance').value;
+
+            const summaryContent = `
+                <h3>Personal Information</h3>
+                <p><strong>Name:</strong> ${firstName} ${lastName}</p>
+                <p><strong>Email:</strong> ${email}</p>
+                <p><strong>Phone:</strong> ${phone}</p>
+                <p><strong>Date of Birth:</strong> ${dob}</p>
+                <h3>Account Setup</h3>
+                <p><strong>Account Type:</strong> ${accountType.charAt(0).toUpperCase() + accountType.slice(1)}</p>
+                <p><strong>Initial Deposit:</strong> $${parseFloat(initialDeposit).toFixed(2)}</p>
+                <p><strong>Trading Experience:</strong> ${tradingExperience.charAt(0).toUpperCase() + tradingExperience.slice(1)}</p>
+                <p><strong>Risk Tolerance:</strong> ${riskTolerance.charAt(0).toUpperCase() + riskTolerance.slice(1)}</p>
+            `;
+            document.getElementById('summary-content').innerHTML = summaryContent;
+        }
+
+        function updateBalance() {
+            const initialDeposit = document.getElementById('initial-deposit').value;
+            document.getElementById('balance').textContent = `$${parseFloat(initialDeposit).toFixed(2)}`;
+        }
+
+        function updateOrderDetails() {
+            const stockSelect = document.getElementById('stock-select');
+            const orderType = document.getElementById('order-type').value;
+            const limitPriceGroup = document.getElementById('limit-price-group');
+            const quantity = document.getElementById('quantity').value || 0;
+            const placeOrderBtn = document.getElementById('place-order');
+
+            const limitPriceInput = document.getElementById('limit-price');
+if (orderType === 'limit') {
+    limitPriceGroup.style.display = 'block';
+    if (!limitPriceInput.value || parseFloat(limitPriceInput.value) <= 0) {
+        placeOrderBtn.disabled = true;
+        return;
+    }
+} else {
+    limitPriceGroup.style.display = 'none';
+}
+
+
+            if (stockSelect.value) {
+                const [_, price] = stockSelect.value.split('|');
+                const commission = quantity * 0.01; // Example commission: $0.01 per share
+                const total = quantity * price + commission;
+
+                document.getElementById('order-shares').textContent = quantity;
+                document.getElementById('order-price').textContent = parseFloat(price).toFixed(2);
+                document.getElementById('order-commission').textContent = commission.toFixed(2);
+                document.getElementById('order-total').textContent = total.toFixed(2);
+                placeOrderBtn.disabled = quantity <= 0;
+            } else {
+                document.getElementById('order-shares').textContent = '0';
+                document.getElementById('order-price').textContent = '0.00';
+                document.getElementById('order-commission').textContent = '0.00';
+                document.getElementById('order-total').textContent = '0.00';
+                placeOrderBtn.disabled = true;
+            }
+        }
+
+    function Buynow() {
+        const stockSelect = document.getElementById('stock-select');
+        const quantity = parseInt(document.getElementById('quantity').value);
+        const [symbol, price] = stockSelect.value.split('|');
+        const totalCost = parseFloat(document.getElementById('order-total').textContent);
+
+        if (!stockSelect.value || quantity <= 0 || isNaN(totalCost)) {
+            alert("Please enter valid order details.");
+            return;
+        }
+
+        const balanceElem = document.getElementById('balance');
+        const portfolioElem = document.querySelector('#trading-dashboard .form-group:nth-child(3) p');
+
+        let currentBalance = parseFloat(balanceElem.textContent.replace('$', '').replace(',', ''));
+        let currentPortfolio = parseFloat(portfolioElem.textContent.replace('$', '').replace(',', ''));
+
+        if (totalCost > currentBalance) {
+            alert("Insufficient funds to complete the purchase.");
+            return;
+        }
+
+        // Deduct cost from balance and add to portfolio
+        currentBalance -= totalCost;
+        currentPortfolio += totalCost;
+
+        balanceElem.textContent = `$${currentBalance.toFixed(2)}`;
+        portfolioElem.textContent = `$${currentPortfolio.toFixed(2)}`;
+
+        if (document.getElementById('order-type').value === 'limit') {
+    const limitPrice = parseFloat(document.getElementById('limit-price').value);
+    if (isNaN(limitPrice) || limitPrice <= 0) {
+        alert("Please enter a valid limit price.");
+        return;
+    }
+}
+
+
+        alert(`Order placed for ${quantity} shares of ${stockSelect.options[stockSelect.selectedIndex].text}`);
+
+        document.getElementById('stock-select').value = "";
+document.getElementById('order-type').value = "market";
+document.getElementById('limit-price').value = "";
+document.getElementById('quantity').value = "";
+updateOrderDetails();
+
+    }
+</script>
+
+    </script>
+</body>
+</html>

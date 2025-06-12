@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Market Sphere - FAQ</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: #000;
+            color: #fff;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 60px 20px;
+            animation: fadeIn 1s ease-out;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 60px;
+            position: relative;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 4px;
+            background: linear-gradient(90deg, #00d4ff, #0099cc);
+            border-radius: 2px;
+        }
+
+        .header h1 {
+            font-size: 3.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #00d4ff, #ffffff, #0099cc);
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 20px;
+            letter-spacing: -1px;
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            color: #b0b0b0;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .faq-container {
+            display: grid;
+            gap: 20px;
+        }
+
+        .faq-item {
+            background: linear-gradient(145deg, #111, #1a1a1a);
+            border-radius: 15px;
+            border: 1px solid #333;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .faq-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #00d4ff, transparent);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .faq-item:hover {
+            border-color: #00d4ff;
+            box-shadow: 0 10px 30px rgba(0, 212, 255, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .faq-item:hover::before {
+            opacity: 1;
+        }
+
+        .faq-question {
+            padding: 25px 30px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s ease;
+            user-select: none;
+        }
+
+        .faq-question:hover {
+            background: rgba(0, 212, 255, 0.05);
+        }
+
+        .faq-question h3 {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #fff;
+            flex-grow: 1;
+            margin-right: 20px;
+        }
+
+        .faq-icon {
+            width: 24px;
+            height: 24px;
+            border: 2px solid #00d4ff;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            flex-shrink: 0;
+        }
+
+        .faq-icon::before {
+            content: '+';
+            color: #00d4ff;
+            font-size: 18px;
+            font-weight: 600;
+            transition: transform 0.3s ease;
+        }
+
+        .faq-item.active .faq-icon {
+            background: #00d4ff;
+            transform: rotate(45deg);
+        }
+
+        .faq-item.active .faq-icon::before {
+            color: #000;
+            transform: rotate(45deg);
+        }
+
+        .faq-answer {
+            max-height: 0;
+            overflow: hidden;
+            transition: all 0.4s ease-out;
+            background: rgba(0, 0, 0, 0.3);
+            opacity: 0;
+        }
+
+        .faq-item.active .faq-answer {
+            max-height: 500px;
+            opacity: 1;
+        }
+
+        .faq-answer-content {
+            padding: 0 30px 30px 30px;
+            color: #b0b0b0;
+            font-size: 1rem;
+            line-height: 1.7;
+        }
+
+        .faq-answer-content p {
+            margin-bottom: 15px;
+        }
+
+        .faq-answer-content p:last-child {
+            margin-bottom: 0;
+        }
+
+        .search-container {
+            margin-bottom: 40px;
+            position: relative;
+        }
+
+        .search-box {
+            width: 100%;
+            padding: 18px 50px 18px 20px;
+            background: linear-gradient(145deg, #111, #1a1a1a);
+            border: 2px solid #333;
+            border-radius: 50px;
+            color: #fff;
+            font-size: 1rem;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .search-box:focus {
+            border-color: #00d4ff;
+            box-shadow: 0 0 20px rgba(0, 212, 255, 0.2);
+        }
+
+        .search-box::placeholder {
+            color: #666;
+        }
+
+        .search-icon {
+            position: absolute;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #00d4ff;
+            font-size: 18px;
+        }
+
+        .no-results {
+            text-align: center;
+            padding: 60px 20px;
+            color: #666;
+            font-size: 1.1rem;
+            display: none;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 40px 15px;
+            }
+
+            .header h1 {
+                font-size: 2.5rem;
+            }
+
+            .faq-question {
+                padding: 20px;
+            }
+
+            .faq-question h3 {
+                font-size: 1.1rem;
+            }
+
+            .faq-answer-content {
+                padding: 0 20px 20px 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Market Sphere FAQ</h1>
+            <p>Find answers to frequently asked questions about trading, investing, and using our platform</p>
+        </div>
+
+        <div class="search-container">
+            <input type="text" class="search-box" placeholder="Search FAQ..." id="searchInput">
+            <span class="search-icon">🔍</span>
+        </div>
+
+        <div class="faq-container" id="faqContainer">
+            <div class="faq-item" data-keywords="account registration signup">
+                <div class="faq-question">
+                    <h3>How do I create an account with Market Sphere?</h3>
+                    <div class="faq-icon"></div>
+                </div>
+                <div class="faq-answer">
+                    <div class="faq-answer-content">
+                        <p>Creating an account is simple and takes just a few minutes. Click the "Sign Up" button, provide your email address, create a secure password, and verify your email.</p>
+                        <p>You'll need to complete identity verification by providing a government-issued ID and proof of address before you can start trading.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="faq-item" data-keywords="deposit money fund account payment">
+                <div class="faq-question">
+                    <h3>What payment methods do you accept for deposits?</h3>
+                    <div class="faq-icon"></div>
+                </div>
+                <div class="faq-answer">
+                    <div class="faq-answer-content">
+                        <p>We accept bank transfers, debit cards, credit cards, and various digital payment methods including PayPal and cryptocurrency.</p>
+                        <p>Bank transfers are free but may take 1-3 business days. Card deposits are instant but may incur a small processing fee.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="faq-item" data-keywords="fees commission costs trading">
+                <div class="faq-question">
+                    <h3>What are your trading fees and commissions?</h3>
+                    <div class="faq-icon"></div>
+                </div>
+                <div class="faq-answer">
+                    <div class="faq-answer-content">
+                        <p>Our fee structure is transparent and competitive. Stock trades start at $0 commission for basic trades, with premium features available for active traders.</p>
+                        <p>Options trading is $0.01 per contract, and crypto trading has a 0.5% spread. No hidden fees or maintenance charges on standard accounts.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="faq-item" data-keywords="security safety protection">
+                <div class="faq-question">
+                    <h3>How secure is my money and personal information?</h3>
+                    <div class="faq-icon"></div>
+                </div>
+                <div class="faq-answer">
+                    <div class="faq-answer-content">
+                        <p>Security is our top priority. We use bank-level 256-bit encryption, two-factor authentication, and cold storage for digital assets.</p>
+                        <p>Your funds are protected by SIPC insurance up to $500,000, and we never store your personal data in plain text. All transactions are monitored 24/7 for suspicious activity.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="faq-item" data-keywords="withdrawal withdraw money cash out">
+                <div class="faq-question">
+                    <h3>How do I withdraw funds from my account?</h3>
+                    <div class="faq-icon"></div>
+                </div>
+                <div class="faq-answer">
+                    <div class="faq-answer-content">
+                        <p>Withdrawals can be made through the same method you used to deposit. Go to your account dashboard, select "Withdraw," choose your method and amount.</p>
+                        <p>Processing times vary: bank transfers take 1-3 days, while digital payments are usually processed within 24 hours.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="faq-item" data-keywords="customer support help contact">
+                <div class="faq-question">
+                    <h3>How can I contact customer support?</h3>
+                    <div class="faq-icon"></div>
+                </div>
+                <div class="faq-answer">
+                    <div class="faq-answer-content">
+                        <p>Our customer support team is available 24/7 through live chat, email, and phone. Premium account holders get priority support with faster response times.</p>
+                        <p>You can also access our comprehensive help center with tutorials, guides, and video explanations for common questions.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="faq-item" data-keywords="research tools analysis charts">
+                <div class="faq-question">
+                    <h3>What research and analysis tools do you provide?</h3>
+                    <div class="faq-icon"></div>
+                </div>
+                <div class="faq-answer">
+                    <div class="faq-answer-content">
+                        <p>We provide professional-grade charting tools, technical indicators, fundamental analysis data, earnings calendars, and market news from trusted sources.</p>
+                        <p>Premium users get access to advanced screening tools, analyst ratings, and institutional research reports to help make informed investment decisions.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="faq-item" data-keywords="minimum deposit account balance">
+                <div class="faq-question">
+                    <h3>What's the minimum deposit required to start trading?</h3>
+                    <div class="faq-icon"></div>
+                </div>
+                <div class="faq-answer">
+                    <div class="faq-answer-content">
+                        <p>There's no minimum deposit for basic accounts. You can start with any amount and begin trading immediately after your account is verified.</p>
+                        <p>However, some advanced features like margin trading require a minimum balance of $2,000 as per regulatory requirements.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="faq-item" data-keywords="crypto cryptocurrency bitcoin ethereum">
+                <div class="faq-question">
+                    <h3>Can I trade cryptocurrencies on Market Sphere?</h3>
+                    <div class="faq-icon"></div>
+                </div>
+                <div class="faq-answer">
+                    <div class="faq-answer-content">
+                        <p>Yes! We support trading of major cryptocurrencies including Bitcoin, Ethereum, and over 50 other digital assets with competitive spreads.</p>
+                        <p>Crypto trading is available 24/7, and you can store your digital assets securely in our integrated wallet with industry-leading security measures.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="no-results" id="noResults">
+            <p>No FAQ items match your search. Try different keywords or contact our support team for help.</p>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const faqItems = document.querySelectorAll('.faq-item');
+            const searchInput = document.getElementById('searchInput');
+            const faqContainer = document.getElementById('faqContainer');
+            const noResults = document.getElementById('noResults');
+
+            // Toggle FAQ items
+            faqItems.forEach(item => {
+                const question = item.querySelector('.faq-question');
+                question.addEventListener('click', () => {
+                    const isActive = item.classList.contains('active');
+                    
+                    // Close all other items
+                    faqItems.forEach(otherItem => {
+                        if (otherItem !== item) {
+                            otherItem.classList.remove('active');
+                        }
+                    });
+                    
+                    // Toggle current item
+                    if (isActive) {
+                        item.classList.remove('active');
+                    } else {
+                        item.classList.add('active');
+                    }
+                });
+            });
+
+            // Search functionality
+            searchInput.addEventListener('input', function() {
+                const searchTerm = this.value.toLowerCase().trim();
+                let visibleItems = 0;
+
+                faqItems.forEach(item => {
+                    const question = item.querySelector('h3').textContent.toLowerCase();
+                    const answer = item.querySelector('.faq-answer-content').textContent.toLowerCase();
+                    const keywords = item.dataset.keywords || '';
+                    
+                    const isMatch = question.includes(searchTerm) || 
+                                   answer.includes(searchTerm) || 
+                                   keywords.includes(searchTerm);
+
+                    if (isMatch || searchTerm === '') {
+                        item.style.display = 'block';
+                        visibleItems++;
+                        
+                        // Add highlight animation
+                        if (searchTerm && isMatch) {
+                            item.style.animation = 'none';
+                            setTimeout(() => {
+                                item.style.animation = 'fadeIn 0.5s ease-out';
+                            }, 10);
+                        }
+                    } else {
+                        item.style.display = 'none';
+                        item.classList.remove('active');
+                    }
+                });
+
+                // Show/hide no results message
+                if (visibleItems === 0 && searchTerm !== '') {
+                    noResults.style.display = 'block';
+                    faqContainer.style.display = 'none';
+                } else {
+                    noResults.style.display = 'none';
+                    faqContainer.style.display = 'grid';
+                }
+            });
+
+            // Clear search on escape
+            searchInput.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape') {
+                    this.value = '';
+                    this.dispatchEvent(new Event('input'));
+                    this.blur();
+                }
+            });
+
+            // Auto-focus search on keyboard shortcuts
+            document.addEventListener('keydown', function(e) {
+                if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+                    e.preventDefault();
+                    searchInput.focus();
+                    searchInput.select();
+                }
+            });
+        });
+    </script>
+</body>
+</html>

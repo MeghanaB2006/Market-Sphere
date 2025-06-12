@@ -1,0 +1,949 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Market Sphere</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/particles.js/2.0.0/particles.min.js"></script>
+    <style>
+        :root {
+            --primary-color: #4facfe;
+            --primary-gradient: linear-gradient(45deg, #4facfe 0%, #00f2fe 100%);
+            --accent-color: #00f2fe;
+            --text-color: #f5f5f5;
+            --bg-color: #0e0e0e;
+            --card-bg: #1a1a1a;
+            --hover-color: #222;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            overflow-x: hidden;
+        }
+        
+        #particles-js {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+        
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        header {
+            background-color: rgba(15, 15, 15, 0.8);
+            backdrop-filter: blur(10px);
+            padding: 20px 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 4px 25px rgba(0, 0, 0, 0.3);
+        }
+        
+        .header-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            font-size: 32px;
+            font-weight: 700;
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 30px rgba(79, 172, 254, 0.5);
+        }
+        
+        nav {
+            display: flex;
+            gap: 25px;
+        }
+        
+        nav a {
+            color: var(--text-color);
+            text-decoration: none;
+            padding: 10px 20px;
+            border-radius: 30px;
+            font-weight: 600;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        nav a:before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: var(--primary-gradient);
+            transition: all 0.3s ease;
+            z-index: -1;
+            border-radius: 30px;
+        }
+        
+        nav a:hover {
+            color: #000;
+        }
+        
+        nav a:hover:before {
+            left: 0;
+        }
+        
+        nav a.active {
+            color: #000;
+            background: var(--primary-gradient);
+        }
+        
+        .hero {
+            padding: 50px 0 30px;
+            text-align: center;
+        }
+        
+        .hero h1 {
+            font-size: 3.5rem;
+            margin-bottom: 20px;
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .hero p {
+            font-size: 1.2rem;
+            max-width: 700px;
+            margin: 0 auto 40px;
+            color: #ccc;
+        }
+        
+        .ticker-container {
+            background-color: rgba(15, 15, 15, 0.6);
+            backdrop-filter: blur(5px);
+            padding: 15px 0;
+            border-top: 1px solid #333;
+            border-bottom: 1px solid #333;
+            overflow: hidden;
+            white-space: nowrap;
+            margin: 20px 0;
+        }
+        
+        .ticker-text {
+            display: inline-block;
+            padding-left: 100%;
+            animation: scroll 30s linear infinite;
+            font-weight: 500;
+            font-size: 1.1rem;
+        }
+        
+        .ticker-text span {
+            margin: 0 25px;
+        }
+        
+        .positive {
+            color: #4cd964;
+        }
+        
+        .negative {
+            color: #ff3b30;
+        }
+        
+        @keyframes scroll {
+            from { transform: translateX(0); }
+            to { transform: translateX(-100%); }
+        }
+        
+        .market-overview {
+            padding: 30px 0;
+        }
+        
+        .section-title {
+            text-align: center;
+            margin-bottom: 40px;
+            position: relative;
+            padding-bottom: 15px;
+        }
+        
+        .section-title:after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 3px;
+            background: var(--primary-gradient);
+        }
+        
+        .market-data {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 30px;
+        }
+        
+        .market-card {
+            background: linear-gradient(145deg, #1f1f1f, #151515);
+            padding: 30px;
+            border-radius: 16px;
+            width: 220px;
+            transition: all 0.3s;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+            border: 1px solid #333;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .market-card:before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(79, 172, 254, 0.1) 0%, transparent 70%);
+            transform: rotate(30deg);
+        }
+        
+        .market-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 30px rgba(0, 0, 0, 0.6);
+            border-color: var(--primary-color);
+        }
+        
+        .market-card h3 {
+            margin-bottom: 10px;
+            font-size: 1.5rem;
+        }
+        
+        .market-card p {
+            font-size: 1.8rem;
+            font-weight: 700;
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .market-card .change {
+            font-size: 1rem;
+            margin-top: 10px;
+        }
+        
+        .chart-container {
+            margin: 30px auto;
+            width: 100%;
+            max-width: 900px;
+            background: rgba(20, 20, 20, 0.8);
+            padding: 30px;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            border: 1px solid #333;
+        }
+        
+        .stocks {
+            margin: 40px auto;
+            width: 90%;
+        }
+        
+        .table-container {
+            overflow-x: auto;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: linear-gradient(145deg, #1c1c1c, #151515);
+            overflow: hidden;
+        }
+        
+        th, td {
+            padding: 20px;
+            text-align: center;
+        }
+        
+        th {
+            background-color: #222;
+            font-weight: 600;
+            font-size: 1.1rem;
+            color: var(--primary-color);
+            position: relative;
+        }
+        
+        tr {
+            transition: all 0.3s;
+            border-bottom: 1px solid #333;
+        }
+        
+        tr:last-child {
+            border-bottom: none;
+        }
+        
+        tr:hover {
+            background-color: #1a1a1a;
+            cursor: pointer;
+        }
+        
+        .company-name {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        .company-logo {
+            width: 30px;
+            height: 30px;
+            background-color: var(--primary-color);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #000;
+            font-weight: bold;
+        }
+        
+        .price-value {
+            font-weight: bold;
+        }
+        
+        .change-value {
+            padding: 5px 15px;
+            border-radius: 30px;
+            font-weight: 600;
+        }
+        
+        .positive-change {
+            background-color: rgba(76, 217, 100, 0.15);
+            color: #4cd964;
+        }
+        
+        .featured-section {
+            padding: 40px 0;
+            text-align: center;
+        }
+        
+        .featured-cards {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            flex-wrap: wrap;
+            margin-top: 40px;
+        }
+        
+        .featured-card {
+            width: 300px;
+            background: linear-gradient(145deg, #1c1c1c, #151515);
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            border: 1px solid #333;
+        }
+        
+        .featured-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+            border-color: var(--primary-color);
+        }
+        
+        .card-image {
+            height: 160px;
+            width: 100%;
+            background: var(--primary-gradient);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            font-weight: bold;
+            color: #fff;
+        }
+        
+        .card-content {
+            padding: 25px;
+        }
+        
+        .card-content h3 {
+            margin-bottom: 15px;
+            font-size: 1.4rem;
+        }
+        
+        .card-content p {
+            color: #aaa;
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+        
+        .card-button {
+            display: inline-block;
+            padding: 10px 25px;
+            background: var(--primary-gradient);
+            color: #000;
+            border-radius: 30px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s;
+        }
+        
+        .card-button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(79, 172, 254, 0.4);
+        }
+        
+        .cta-section {
+            text-align: center;
+            padding: 80px 0;
+            background: linear-gradient(rgba(15, 15, 15, 0.9), rgba(15, 15, 15, 0.9)), url('/api/placeholder/1200/400') center/cover no-repeat;
+            border-radius: 16px;
+            margin: 0 auto 60px;
+            width: 90%;
+            max-width: 1200px;
+        }
+        
+        .cta-content {
+            max-width: 700px;
+            margin: 0 auto;
+        }
+        
+        .cta-content h2 {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .cta-content p {
+            font-size: 1.2rem;
+            color: #ccc;
+            margin-bottom: 30px;
+        }
+        
+        .cta-buttons {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+        }
+        
+        .primary-button {
+            padding: 15px 35px;
+            background: var(--primary-gradient);
+            color: #000;
+            font-weight: 600;
+            border-radius: 50px;
+            text-decoration: none;
+            transition: all 0.3s;
+            box-shadow: 0 5px 15px rgba(79, 172, 254, 0.4);
+        }
+        
+        .primary-button:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 25px rgba(79, 172, 254, 0.6);
+        }
+        
+        .outline-button {
+            padding: 14px 34px;
+            border: 2px solid var(--primary-color);
+            color: var(--primary-color);
+            font-weight: 600;
+            border-radius: 50px;
+            text-decoration: none;
+            transition: all 0.3s;
+        }
+        
+        .outline-button:hover {
+            background-color: rgba(79, 172, 254, 0.1);
+            transform: translateY(-5px);
+        }
+        
+        footer {
+            background-color: rgba(15, 15, 15, 0.8);
+            padding: 60px 0 30px;
+            text-align: center;
+            margin-top: 50px;
+            border-top: 1px solid #333;
+        }
+        
+        .footer-content {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            gap: 40px;
+            margin-bottom: 50px;
+            text-align: left;
+        }
+        
+        .footer-column {
+            flex: 1;
+            min-width: 200px;
+        }
+        
+        .footer-column h3 {
+            color: var(--primary-color);
+            margin-bottom: 20px;
+            position: relative;
+            padding-bottom: 10px;
+        }
+        
+        .footer-column h3:after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 40px;
+            height: 2px;
+            background: var(--primary-gradient);
+        }
+        
+        .footer-links {
+            list-style: none;
+        }
+        
+        .footer-links li {
+            margin-bottom: 12px;
+        }
+        
+        .footer-links a {
+            color: #ccc;
+            text-decoration: none;
+            transition: all 0.3s;
+        }
+        
+        .footer-links a:hover {
+            color: var(--primary-color);
+            padding-left: 5px;
+        }
+        
+        .copyright {
+            padding-top: 20px;
+            border-top: 1px solid #333;
+            color: #888;
+        }
+        
+        @media (max-width: 768px) {
+            .header-container {
+                flex-direction: column;
+                gap: 20px;
+            }
+            
+            nav {
+                width: 100%;
+                justify-content: center;
+                flex-wrap: wrap;
+            }
+            
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+            
+            .market-card {
+                width: 100%;
+                max-width: 300px;
+            }
+            
+            .footer-content {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .footer-column h3:after {
+                left: 50%;
+                transform: translateX(-50%);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="particles-js"></div>
+    
+    <header>
+        <div class="container header-container">
+            <div class="logo">Market Sphere</div>
+            <nav>
+                <a href="#" class="active">Home</a>
+                <a href="markets2.html">Markets</a>
+                <a href="news.html">News</a>
+                <a href="portfolio.html">Portfolio</a>
+                <a href="contact.html">Contact</a>
+            </nav>
+        </div>
+    </header>
+    
+    <section class="hero container">
+        <h1>Your Gateway to Financial Success</h1>
+        <p>Track, analyze, and optimize your investments with real-time market data and expert insights.</p>
+    </section>
+    
+    <div class="ticker-container">
+        <div class="ticker-text">
+            <span>Reliance <span class="positive">+2.45%</span></span>
+            <span>Tata Steel <span class="positive">+1.89%</span></span>
+            <span>Infosys <span class="positive">+3.12%</span></span>
+            <span>HDFC Bank <span class="positive">+1.22%</span></span>
+            <span>ICICI <span class="positive">+2.01%</span></span>
+            <span>Apple <span class="positive">+1.75%</span></span>
+            <span>Tesla <span class="negative">-0.86%</span></span>
+            <span>Microsoft <span class="positive">+2.31%</span></span>
+        </div>
+    </div>
+    
+    <section class="market-overview container">
+        <h2 class="section-title">Market Overview</h2>
+        <div class="market-data">
+            <div class="market-card">
+                <h3>S&P 500</h3>
+                <p>4,295.65</p>
+                <div class="change positive">+1.24%</div>
+            </div>
+            <div class="market-card">
+                <h3>Dow Jones</h3>
+                <p>33,700.98</p>
+                <div class="change positive">+0.87%</div>
+            </div>
+            <div class="market-card">
+                <h3>Nasdaq</h3>
+                <p>13,201.33</p>
+                <div class="change positive">+1.58%</div>
+            </div>
+            <div class="market-card">
+                <h3>Bitcoin</h3>
+                <p>64,210.75</p>
+                <div class="change positive">+2.35%</div>
+            </div>
+        </div>
+        
+        <div class="chart-container">
+            <canvas id="marketChart"></canvas>
+        </div>
+    </section>
+    
+    <section class="stocks container">
+        <h2 class="section-title">Top Gaining Stocks</h2>
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Company</th>
+                        <th>Symbol</th>
+                        <th>Price</th>
+                        <th>Change</th>
+                        <th>Volume</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr onclick="window.location.href='reliance.html'">
+                        <td>
+                            <div class="company-name">
+                                <div class="company-logo">R</div>
+                                Reliance
+                            </div>
+                        </td>
+                        <td>RELI</td>
+                        <td class="price-value">$2,400</td>
+                        <td><span class="change-value positive-change">+2.45%</span></td>
+                        <td>5.2M</td>
+                    </tr>
+                    <tr onclick="window.location.href='tata-steel.html'">
+                        <td>
+                            <div class="company-name">
+                                <div class="company-logo">T</div>
+                                Tata Steel
+                            </div>
+                        </td>
+                        <td>TATA</td>
+                        <td class="price-value">$1,050</td>
+                        <td><span class="change-value positive-change">+1.89%</span></td>
+                        <td>3.8M</td>
+                    </tr>
+                    <tr onclick="window.location.href='infosys.html'">
+                        <td>
+                            <div class="company-name">
+                                <div class="company-logo">I</div>
+                                Infosys
+                            </div>
+                        </td>
+                        <td>INFY</td>
+                        <td class="price-value">$1,500</td>
+                        <td><span class="change-value positive-change">+3.12%</span></td>
+                        <td>7.1M</td>
+                    </tr>
+                    <tr onclick="window.location.href='hdfc.html'">
+                        <td>
+                            <div class="company-name">
+                                <div class="company-logo">H</div>
+                                HDFC Bank
+                            </div>
+                        </td>
+                        <td>HDFC</td>
+                        <td class="price-value">$1,650</td>
+                        <td><span class="change-value positive-change">+1.22%</span></td>
+                        <td>4.5M</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+    
+    <section class="featured-section container">
+        <h2 class="section-title">Featured Services</h2>
+        <div class="featured-cards">
+            <div class="featured-card">
+                <div class="card-image">Portfolio</div>
+                <div class="card-content">
+                    <h3>Portfolio Tracking</h3>
+                    <p>Monitor your investments in real-time with our advanced portfolio tracking system.</p>
+                </div>
+            </div>
+            <div class="featured-card">
+                <div class="card-image">Analysis</div>
+                <div class="card-content">
+                    <h3>Market Analysis</h3>
+                    <p>Get expert insights and detailed analysis on market trends and stock performance.</p>
+                </div>
+            </div>
+            <div class="featured-card">
+                <div class="card-image">Alerts</div>
+                <div class="card-content">
+                    <h3>Price Alerts</h3>
+                    <p>Set custom alerts for price movements and never miss an investment opportunity.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <section class="cta-section">
+        <div class="cta-content">
+            <h2>Ready to Start Investing?</h2>
+            <p>Join thousands of successful investors who trust Market Sphere for their financial decisions.</p>
+            <div class="cta-buttons">
+                <a href="getStarted.html" class="primary-button">Get Started</a>
+            </div>
+        </div>
+    </section>
+    
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-column">
+                    <h3>Company</h3>
+                    <ul class="footer-links">
+                        <li><a href="contact.html">About Us</a></li>
+                        <li><a href="news.html">News</a></li>
+                        <li><a href="markets.html">Markets</a></li>
+                        <li><a href="contact.html">Contact</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h3>Services</h3>
+                    <ul class="footer-links">
+                        <li><a href="#">Market Data</a></li>
+                        <li><a href="#">Portfolio Tracking</a></li>
+                        <li><a href="#">Market Analysis</a></li>
+                        <li><a href="#">Price Alerts</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h3>Resources</h3>
+                    <ul class="footer-links">
+                        <li><a href="blog.html">Blog</a></li>
+                        <li><a href="#">Tutorials</a></li>
+                        <li><a href="FAQ.html">FAQs</a></li>
+                        <li><a href="contact.html">Support</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h3>Legal</h3>
+                    <ul class="footer-links">
+                        <li><a href="#">Terms of Service</a></li>
+                        <li><a href="#">Privacy Policy</a></li>
+                        <li><a href="#">Cookie Policy</a></li>
+                        <li><a href="#">Disclaimer</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="copyright">
+                <p>© 2025 Market Sphere | All Rights Reserved</p>
+            </div>
+        </div>
+    </footer>
+    
+    <script>
+        particlesJS('particles-js', {
+            "particles": {
+                "number": {
+                    "value": 80,
+                    "density": {
+                        "enable": true,
+                        "value_area": 800
+                    }
+                },
+                "color": {
+                    "value": "#4facfe"
+                },
+                "shape": {
+                    "type": "circle",
+                    "stroke": {
+                        "width": 0,
+                        "color": "#000000"
+                    },
+                },
+                "opacity": {
+                    "value": 0.2,
+                    "random": true,
+                    "anim": {
+                        "enable": true,
+                        "speed": 1,
+                        "opacity_min": 0.1,
+                        "sync": false
+                    }
+                },
+                "size": {
+                    "value": 3,
+                    "random": true,
+                    "anim": {
+                        "enable": true,
+                        "speed": 2,
+                        "size_min": 0.1,
+                        "sync": false
+                    }
+                },
+                "line_linked": {
+                    "enable": true,
+                    "distance": 150,
+                    "color": "#4facfe",
+                    "opacity": 0.2,
+                    "width": 1
+                },
+                "move": {
+                    "enable": true,
+                    "speed": 1,
+                    "direction": "none",
+                    "random": true,
+                    "straight": false,
+                    "out_mode": "out",
+                    "bounce": false,
+                }
+            },
+            "interactivity": {
+                "detect_on": "canvas",
+                "events": {
+                    "onhover": {
+                        "enable": true,
+                        "mode": "grab"
+                    },
+                    "onclick": {
+                        "enable": true,
+                        "mode": "push"
+                    },
+                    "resize": true
+                },
+                "modes": {
+                    "grab": {
+                        "distance": 140,
+                        "line_linked": {
+                            "opacity": 1
+                        }
+                    },
+                    "push": {
+                        "particles_nb": 4
+                    }
+                }
+            },
+            "retina_detect": true
+        });
+
+        const ctx = document.getElementById('marketChart').getContext('2d');
+        const marketChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+                datasets: [{
+                    label: 'S&P 500',
+                    data: [3800, 3950, 4100, 4050, 4200, 4150, 4300, 4250, 4400, 4295, 4370, 4450],
+                    borderColor: '#4facfe',
+                    backgroundColor: 'rgba(79, 172, 254, 0.1)',
+                    borderWidth: 2,
+                    pointBackgroundColor: '#4facfe',
+                    tension: 0.4,
+                    fill: true
+                }, {
+                    label: 'Nasdaq',
+                    data: [12200, 12600, 12900, 12700, 13000, 12800, 13200, 13100, 13400, 13201, 13500, 13700],
+                    borderColor: '#00f2fe',
+                    backgroundColor: 'rgba(0, 242, 254, 0.1)',
+                    borderWidth: 2,
+                    pointBackgroundColor: '#00f2fe',
+                    tension: 0.4,
+                    fill: true
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: false,
+                        grid: {
+                            color: 'rgba(255, 255, 255, 0.05)'
+                        },
+                        ticks: {
+                            color: '#aaa'
+                        }
+                    },
+                    x: {
+                        grid: {
+                            color: 'rgba(255, 255, 255, 0.05)'
+                        },
+                        ticks: {
+                            color: '#aaa'
+                        }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        labels: {
+                            color: '#ccc',
+                            font: {
+                                family: 'Poppins'
+                            }
+                        }
+                    },
+                    tooltip: {
+                        backgroundColor: 'rgba(20, 20, 20, 0.9)',
+                        titleColor: '#4facfe',
+                        bodyColor: '#fff',
+                        borderColor: '#333',
+                        borderWidth: 1,
+                        titleFont: {
+                            family: 'Poppins',
+                            weight: 'bold'
+                        },
+                        bodyFont: {
+                            family: 'Poppins'
+                        },
+                        padding: 12
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>

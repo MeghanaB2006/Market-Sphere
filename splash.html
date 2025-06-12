@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Market Sphere - Welcome</title>
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            width: 100%;
+            overflow: hidden;
+            background-color: #000;
+        }
+        .splash-screen {
+            height: 100vh;
+            width: 100vw;
+            background: url('Screenshot%202025-03-26%20213352.png') no-repeat center center;
+            background-size: contain; /* Makes the entire image fit without cropping */
+            background-color: #000;
+        }
+    </style>
+</head>
+<body>
+    <div class="splash-screen"></div>
+
+    <script>
+        setTimeout(function() {
+            window.location.href = "all.html"; // Redirect after 3 seconds
+        }, 3000);
+    </script>
+</body>
+</html>
